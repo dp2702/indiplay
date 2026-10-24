@@ -1,0 +1,1976 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Musify Lite - a GitHub Pages-friendly music library built around Invidious search and playback."
+    />
+    <title>Musify Lite</title>
+    <style>
+      :root {
+        --background: #0b1020;
+        --surface: #131a2d;
+        --surface-2: #1a2340;
+        --text: #f4f7ff;
+        --muted: #9aa6c2;
+        --accent: #7c5cff;
+        --accent-2: #21c7d9;
+        --danger: #ff5d73;
+        --success: #36d399;
+        --border: rgba(255, 255, 255, 0.1);
+        --shadow: rgba(3, 7, 18, 0.5);
+        --radius: 16px;
+        --header-height: 72px;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--background);
+        color: var(--text);
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      body[data-theme="light"] {
+        --background: #eef4ff;
+        --surface: #ffffff;
+        --surface-2: #e5ebff;
+        --text: #182033;
+        --muted: #58657f;
+        --accent: #5d4dff;
+        --accent-2: #0b9cad;
+        --danger: #d93f5d;
+        --success: #1fae72;
+        --border: rgba(24, 32, 51, 0.08);
+        --shadow: rgba(17, 24, 39, 0.12);
+      }
+
+      button, input, select, textarea {
+        font: inherit;
+      }
+
+      a {
+        color: var(--accent-2);
+        text-decoration: none;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .app-shell {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr) 320px;
+        min-height: 100vh;
+        background: linear-gradient(180deg, rgba(14, 20, 34, 0.95), rgba(11, 16, 32, 1));
+      }
+
+      .sidebar {
+        background: rgba(19, 26, 45, 0.9);
+        border-right: 1px solid var(--border);
+        padding: 18px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        font-weight: 800;
+        color: white;
+      }
+
+      .brand h1 {
+        margin: 0;
+        font-size: 1.06rem;
+        letter-spacing: 0.02em;
+      }
+
+      .nav-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-btn,
+      .action-btn,
+      .chip,
+      .ghost-btn,
+      .primary-btn,
+      .danger-btn,
+      .tiny-btn {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        cursor: pointer;
+        transition: 0.2s ease;
+      }
+
+      .nav-btn {
+        width: 100%;
+        text-align: left;
+        padding: 12px 12px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+
+      .nav-btn.active {
+        background: rgba(124, 92, 255, 0.12);
+        border-color: rgba(124, 92, 255, 0.6);
+        color: var(--text);
+      }
+
+      .nav-btn:hover,
+      .action-btn:hover,
+      .chip:hover,
+      .primary-btn:hover,
+      .ghost-btn:hover,
+      .danger-btn:hover,
+      .tiny-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .sidebar-meta {
+        margin-top: auto;
+        padding: 14px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .topbar {
+        height: var(--header-height);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(19, 26, 45, 0.65);
+        backdrop-filter: blur(12px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .topbar h2 {
+        margin: 0;
+        font-size: clamp(1.2rem, 2vw, 1.6rem);
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .primary-btn,
+      .action-btn,
+      .ghost-btn,
+      .danger-btn,
+      .tiny-btn {
+        padding: 10px 14px;
+        min-height: 42px;
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        border: none;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .ghost-btn {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .danger-btn {
+        background: rgba(255, 93, 115, 0.08);
+        border-color: rgba(255, 93, 115, 0.4);
+        color: var(--danger);
+      }
+
+      .tiny-btn {
+        padding: 8px 10px;
+        min-height: 36px;
+        font-size: 0.82rem;
+      }
+
+      .content {
+        padding: 24px;
+        overflow: auto;
+      }
+
+      .view {
+        display: none;
+        gap: 20px;
+      }
+
+      .view.active {
+        display: grid;
+      }
+
+      .hero,
+      .card,
+      .panel,
+      .queue-card,
+      .playlist-card,
+      .history-card,
+      .favorite-card,
+      .section-box {
+        background: rgba(19, 26, 45, 0.78);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: 0 12px 28px var(--shadow);
+      }
+
+      .hero {
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 18px;
+      }
+
+      .hero h3 {
+        margin: 0 0 8px;
+        font-size: clamp(1.6rem, 2vw, 2.3rem);
+      }
+
+      .hero p {
+        margin: 0 0 18px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .hero-actions,
+      .action-row,
+      .inline-actions,
+      .chip-stack,
+      .queue-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        gap: 10px;
+      }
+
+      .metric {
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.2rem;
+        margin-top: 8px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .section-title {
+        margin: 0;
+        font-size: 1.15rem;
+      }
+
+      .grid-2,
+      .grid-3 {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .panel h4,
+      .card h4,
+      .section-box h4,
+      .playlist-card h4,
+      .history-card h4,
+      .favorite-card h4 {
+        margin: 0 0 14px;
+        font-size: 1rem;
+      }
+
+      .empty-state {
+        padding: 12px;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .track-list,
+      .playlist-list,
+      .history-list,
+      .favorite-list,
+      .queue-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .track-item,
+      .queue-item,
+      .playlist-item,
+      .history-item,
+      .favorite-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.015);
+      }
+
+      .track-main,
+      .queue-main,
+      .history-main,
+      .favorite-main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .track-main strong,
+      .queue-main strong,
+      .history-main strong,
+      .favorite-main strong {
+        font-size: 0.96rem;
+      }
+
+      .track-main span,
+      .queue-main span,
+      .history-main span,
+      .favorite-main span {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .track-actions,
+      .queue-actions,
+      .history-actions,
+      .favorite-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+      }
+
+      .search-input,
+      .field,
+      .textarea,
+      .select {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        padding: 12px 14px;
+      }
+
+      textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .checkbox-row:last-child {
+        border-bottom: none;
+      }
+
+      .toggle {
+        position: relative;
+        width: 52px;
+        height: 30px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid var(--border);
+        cursor: pointer;
+      }
+
+      .toggle::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 4px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: white;
+        transition: transform 0.2s ease;
+      }
+
+      .toggle.on {
+        background: rgba(54, 211, 153, 0.22);
+      }
+
+      .toggle.on::after {
+        transform: translateX(20px);
+      }
+
+      .media-shell {
+        display: grid;
+        gap: 12px;
+      }
+
+      .player-frame-wrap {
+        position: relative;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #040918;
+        min-height: 420px;
+        border: 1px solid var(--border);
+      }
+
+      .player-iframe,
+      .search-iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 420px;
+        border: 0;
+        background: #050b18;
+      }
+
+      .inline-info {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .chip {
+        padding: 8px 10px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .chip.active {
+        background: rgba(33, 199, 217, 0.12);
+        border-color: rgba(33, 199, 217, 0.5);
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 8px;
+        border-radius: 999px;
+        background: rgba(124, 92, 255, 0.12);
+        color: var(--text);
+        font-size: 0.8rem;
+      }
+
+      .queue-panel {
+        background: rgba(19, 26, 45, 0.68);
+        border-left: 1px solid var(--border);
+        padding: 16px 14px;
+      }
+
+      .queue-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .queue-panel-header h3 {
+        margin: 0;
+      }
+
+      .queue-item.active {
+        background: rgba(124, 92, 255, 0.09);
+        border-color: rgba(124, 92, 255, 0.5);
+      }
+
+      .queue-track {
+        width: 100%;
+      }
+
+      .mini-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .sticky-player {
+        position: sticky;
+        bottom: 0;
+        margin-top: auto;
+        background: rgba(17, 22, 35, 0.92);
+        border-top: 1px solid var(--border);
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .player-summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .cover-art {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: grid;
+        place-items: center;
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      .player-summary strong,
+      .player-summary span {
+        display: block;
+      }
+
+      .player-summary span {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .playlist-form,
+      .lib-form,
+      .settings-grid {
+        display: grid;
+        gap: 12px;
+      }
+
+      .settings-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      @media (max-width: 1100px) {
+        .app-shell {
+          grid-template-columns: 200px minmax(0, 1fr);
+        }
+
+        .queue-panel {
+          grid-column: 1 / -1;
+          border-left: none;
+          border-top: 1px solid var(--border);
+        }
+      }
+
+      @media (max-width: 800px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          padding-bottom: 6px;
+        }
+
+        .nav-list {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .content,
+        .topbar {
+          padding-left: 12px;
+          padding-right: 12px;
+        }
+
+        .hero,
+        .grid-2,
+        .grid-3,
+        .field-grid,
+        .settings-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .sticky-player {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body data-theme="dark">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand">
+          <div class="brand-mark">M</div>
+          <h1>Musify Lite</h1>
+        </div>
+
+        <nav class="nav-list" aria-label="Main navigation">
+          <button class="nav-btn active" data-view="home">Home</button>
+          <button class="nav-btn" data-view="search">Search</button>
+          <button class="nav-btn" data-view="favorites">Favorites</button>
+          <button class="nav-btn" data-view="playlists">Playlists</button>
+          <button class="nav-btn" data-view="history">History</button>
+          <button class="nav-btn" data-view="settings">Settings</button>
+        </nav>
+
+        <div class="sidebar-meta">
+          <strong>Version</strong><br />
+          0.1.0 – static GitHub Pages build
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <h2 id="viewTitle">Home</h2>
+          <div class="topbar-actions">
+            <button class="ghost-btn" id="openSearchTabBtn" type="button">Open Invidious</button>
+            <button class="primary-btn" id="quickAddBtn" type="button">Add Track</button>
+          </div>
+        </header>
+
+        <div class="content">
+          <section id="homeView" class="view active" aria-label="Home view">
+            <div class="hero">
+              <div>
+                <h3>Local library. Native Invidious playback.</h3>
+                <p>
+                  Musify Lite keeps your queue, favorites, playlists, and history in the browser,
+                  while search and playback stay in the configured Invidious instance.
+                </p>
+                <div class="hero-actions">
+                  <button class="primary-btn" type="button" data-action="search-dock">Search</button>
+                  <button class="ghost-btn" type="button" data-action="paste-url">Paste URL</button>
+                  <button class="ghost-btn" type="button" data-action="open-instance">Open Invidious</button>
+                </div>
+              </div>
+              <div class="metric-grid">
+                <div class="metric">
+                  <span>Queue</span>
+                  <strong id="queueMetric">0</strong>
+                </div>
+                <div class="metric">
+                  <span>Favorites</span>
+                  <strong id="favoritesMetric">0</strong>
+                </div>
+                <div class="metric">
+                  <span>History</span>
+                  <strong id="historyMetric">0</strong>
+                </div>
+                <div class="metric">
+                  <span>Playlists</span>
+                  <strong id="playlistsMetric">0</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-2">
+              <div class="panel">
+                <div class="section-header">
+                  <h4 class="section-title">Continue listening</h4>
+                  <span class="pill" id="currentTrackPill">No track</span>
+                </div>
+                <div id="continueListeningCard" class="empty-state">
+                  No current track yet. Add a song or paste a YouTube or Invidious URL to begin.
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="section-header">
+                  <h4 class="section-title">Quick add</h4>
+                </div>
+                <form id="quickAddForm" class="lib-form">
+                  <input id="quickAddUrl" class="field" type="text" placeholder="Paste a YouTube URL or 11-char video ID" aria-label="Video URL or ID" />
+                  <div class="field-grid">
+                    <input id="quickAddTitle" class="field" type="text" placeholder="Title (optional)" aria-label="Title" />
+                    <input id="quickAddArtist" class="field" type="text" placeholder="Artist (optional)" aria-label="Artist" />
+                  </div>
+                  <div class="inline-actions">
+                    <button class="primary-btn" type="submit">Play now</button>
+                    <button class="ghost-btn" type="button" data-action="queue-track">Add to queue</button>
+                    <button class="ghost-btn" type="button" data-action="favorite-track">Add to favorites</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              <div class="panel">
+                <div class="section-header">
+                  <h4 class="section-title">Recent tracks</h4>
+                </div>
+                <div id="recentHistoryList" class="track-list"></div>
+              </div>
+
+              <div class="panel">
+                <div class="section-header">
+                  <h4 class="section-title">Favorites</h4>
+                </div>
+                <div id="homeFavoritesList" class="track-list"></div>
+              </div>
+
+              <div class="panel">
+                <div class="section-header">
+                  <h4 class="section-title">Playlists</h4>
+                </div>
+                <div id="homePlaylistsList" class="track-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <section id="searchView" class="view" aria-label="Search view">
+            <div class="panel">
+              <div class="section-header">
+                <h4 class="section-title">Native Invidious search</h4>
+              </div>
+              <form id="searchForm" class="stack">
+                <div class="search-box">
+                  <input id="searchInput" class="search-input" type="search" placeholder="Search on the configured Invidious instance" aria-label="Search query" />
+                  <button class="primary-btn" type="submit">Search</button>
+                </div>
+                <div class="inline-actions">
+                  <button class="ghost-btn" type="button" id="clearSearchBtn">Clear</button>
+                  <button class="ghost-btn" type="button" id="reloadSearchBtn">Reload iframe</button>
+                  <button class="ghost-btn" type="button" id="openSearchNewTabBtn">Open in new tab</button>
+                  <button class="ghost-btn" type="button" id="toggleFullscreenBtn">Fullscreen search</button>
+                  <button class="ghost-btn" type="button" id="returnNowPlayingBtn">Return to Now Playing</button>
+                </div>
+              </form>
+
+              <div class="chip-stack" id="recentSearchChips" aria-live="polite"></div>
+
+              <div class="media-shell" style="margin-top: 16px;">
+                <div class="panel" style="padding: 12px;">
+                  <p class="inline-info" style="margin: 0 0 10px;">
+                    Search results are controlled by the Invidious website in the iframe below. Musify Lite cannot detect a selected result automatically.
+                  </p>
+                  <form id="searchUrlForm" class="stack">
+                    <label for="pastedResultUrl" class="sr-only">Copied result URL</label>
+                    <input id="pastedResultUrl" class="field" type="text" placeholder="Paste a selected search result URL or copy a video URL here" aria-label="Selected result URL" />
+                    <div class="inline-actions">
+                      <button class="primary-btn" type="submit">Load track</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="player-frame-wrap">
+                  <iframe id="searchIframe" class="search-iframe" title="Invidious search" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="favoritesView" class="view" aria-label="Favorites view">
+            <div class="panel">
+              <div class="section-header">
+                <h4 class="section-title">Favorites</h4>
+                <div class="inline-actions">
+                  <button class="ghost-btn" type="button" id="favoriteSortBtn">Sort by date</button>
+                </div>
+              </div>
+              <div id="favoritesList" class="favorite-list"></div>
+            </div>
+          </section>
+
+          <section id="playlistsView" class="view" aria-label="Playlists view">
+            <div class="panel">
+              <div class="section-header">
+                <h4 class="section-title">Playlists</h4>
+                <button class="primary-btn" type="button" id="createPlaylistBtn">New playlist</button>
+              </div>
+              <form id="playlistForm" class="playlist-form" style="display: none;">
+                <input id="playlistNameInput" class="field" type="text" placeholder="Playlist name" aria-label="Playlist name" />
+                <div class="inline-actions">
+                  <button class="primary-btn" type="submit">Save playlist</button>
+                  <button class="ghost-btn" type="button" id="cancelPlaylistBtn">Cancel</button>
+                </div>
+              </form>
+              <div id="playlistsList" class="playlist-list"></div>
+            </div>
+          </section>
+
+          <section id="historyView" class="view" aria-label="History view">
+            <div class="panel">
+              <div class="section-header">
+                <h4 class="section-title">History</h4>
+                <button class="danger-btn" type="button" id="clearHistoryBtn">Clear history</button>
+              </div>
+              <div id="historyList" class="history-list"></div>
+            </div>
+          </section>
+
+          <section id="settingsView" class="view" aria-label="Settings view">
+            <div class="panel">
+              <div class="section-header">
+                <h4 class="section-title">Settings</h4>
+              </div>
+              <div class="settings-grid">
+                <div class="stack">
+                  <label>
+                    <span class="inline-info">Invidious instance</span>
+                    <input id="instanceInput" class="field" type="url" placeholder="https://invidious.tiekoetter.com" />
+                  </label>
+                  <label>
+                    <span class="inline-info">Default player mode</span>
+                    <select id="playerModeInput" class="select">
+                      <option value="listen">Listen</option>
+                      <option value="video">Video</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span class="inline-info">Theme</span>
+                    <select id="themeInput" class="select">
+                      <option value="dark">Dark</option>
+                      <option value="light">Light</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span class="inline-info">History limit</span>
+                    <input id="historyLimitInput" class="field" type="number" min="10" max="500" step="10" />
+                  </label>
+                </div>
+                <div class="stack">
+                  <div class="checkbox-row">
+                    <span>Attempt autoplay</span>
+                    <button type="button" class="toggle on" data-toggle="autoplay" aria-label="Attempt autoplay"></button>
+                  </div>
+                  <div class="checkbox-row">
+                    <span>Use local=true on embed</span>
+                    <button type="button" class="toggle on" data-toggle="localProxy" aria-label="Use local proxy"></button>
+                  </div>
+                  <div class="checkbox-row">
+                    <span>Remember queue</span>
+                    <button type="button" class="toggle on" data-toggle="rememberQueue" aria-label="Remember queue"></button>
+                  </div>
+                  <div class="checkbox-row">
+                    <span>Remember queue on reload</span>
+                    <button type="button" class="toggle on" data-toggle="rememberQueue" aria-label="Remember queue on reload"></button>
+                  </div>
+                </div>
+              </div>
+              <div class="inline-actions" style="margin-top: 18px;">
+                <button class="primary-btn" type="button" id="saveSettingsBtn">Save settings</button>
+                <button class="ghost-btn" type="button" id="exportBackupBtn">Export backup</button>
+                <button class="ghost-btn" type="button" id="importBackupBtn">Import backup</button>
+                <button class="danger-btn" type="button" id="resetDataBtn">Reset all data</button>
+              </div>
+              <input id="backupFileInput" type="file" accept="application/json" class="sr-only" />
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside class="queue-panel" aria-label="Queue panel">
+        <div class="queue-panel-header">
+          <h3>Queue</h3>
+          <button class="tiny-btn ghost-btn" type="button" id="clearQueueBtn">Clear</button>
+        </div>
+        <div id="queueList" class="queue-list"></div>
+        <div class="queue-actions" style="margin-top: 14px;">
+          <button class="primary-btn" type="button" id="playPreviousBtn">Previous</button>
+          <button class="primary-btn" type="button" id="playNextBtn">Next</button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="sticky-player" aria-live="polite">
+      <div class="player-summary">
+        <div class="cover-art" id="playerCover">♫</div>
+        <div>
+          <strong id="nowPlayingTitle">Nothing playing</strong>
+          <span id="nowPlayingMeta">Add a track to start</span>
+        </div>
+      </div>
+      <div class="inline-actions">
+        <button class="ghost-btn" type="button" id="reloadPlayerBtn">Reload embed</button>
+        <button class="ghost-btn" type="button" id="togglePlayerModeBtn">Switch to Video</button>
+        <button class="ghost-btn" type="button" id="openWatchBtn">Open native watch</button>
+      </div>
+    </div>
+
+    <iframe id="playerIframe" class="player-iframe" title="Invidious player" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+
+    <script>
+      const STORAGE_KEYS = {
+        settings: 'musifyLite.settings',
+        queue: 'musifyLite.queue',
+        favorites: 'musifyLite.favorites',
+        playlists: 'musifyLite.playlists',
+        history: 'musifyLite.history',
+        searches: 'musifyLite.searchHistory',
+        currentTrack: 'musifyLite.currentTrack'
+      };
+
+      const DEFAULT_SETTINGS = {
+        instance: 'https://invidious.tiekoetter.com',
+        defaultPlayerMode: 'listen',
+        autoplay: true,
+        localProxy: true,
+        rememberQueue: true,
+        theme: 'dark',
+        historyLimit: 100
+      };
+
+      const state = {
+        currentView: 'home',
+        currentTrack: null,
+        queue: [],
+        queueIndex: -1,
+        favorites: [],
+        playlists: [],
+        history: [],
+        searchHistory: [],
+        settings: { ...DEFAULT_SETTINGS },
+        sortMode: 'date'
+      };
+
+      const els = {
+        body: document.body,
+        viewTitle: document.getElementById('viewTitle'),
+        queueMetric: document.getElementById('queueMetric'),
+        favoritesMetric: document.getElementById('favoritesMetric'),
+        historyMetric: document.getElementById('historyMetric'),
+        playlistsMetric: document.getElementById('playlistsMetric'),
+        homeFavoritesList: document.getElementById('homeFavoritesList'),
+        recentHistoryList: document.getElementById('recentHistoryList'),
+        homePlaylistsList: document.getElementById('homePlaylistsList'),
+        continueListeningCard: document.getElementById('continueListeningCard'),
+        currentTrackPill: document.getElementById('currentTrackPill'),
+        queueList: document.getElementById('queueList'),
+        favoritesList: document.getElementById('favoritesList'),
+        historyList: document.getElementById('historyList'),
+        playlistsList: document.getElementById('playlistsList'),
+        recentSearchChips: document.getElementById('recentSearchChips'),
+        searchIframe: document.getElementById('searchIframe'),
+        playerIframe: document.getElementById('playerIframe'),
+        nowPlayingTitle: document.getElementById('nowPlayingTitle'),
+        nowPlayingMeta: document.getElementById('nowPlayingMeta'),
+        playerCover: document.getElementById('playerCover'),
+        instanceInput: document.getElementById('instanceInput'),
+        playerModeInput: document.getElementById('playerModeInput'),
+        themeInput: document.getElementById('themeInput'),
+        historyLimitInput: document.getElementById('historyLimitInput'),
+        backupFileInput: document.getElementById('backupFileInput'),
+        playlistForm: document.getElementById('playlistForm'),
+        playlistNameInput: document.getElementById('playlistNameInput'),
+        searchForm: document.getElementById('searchForm'),
+        searchInput: document.getElementById('searchInput'),
+        searchUrlForm: document.getElementById('searchUrlForm'),
+        pastedResultUrl: document.getElementById('pastedResultUrl'),
+        quickAddForm: document.getElementById('quickAddForm'),
+        quickAddUrl: document.getElementById('quickAddUrl'),
+        quickAddTitle: document.getElementById('quickAddTitle'),
+        quickAddArtist: document.getElementById('quickAddArtist')
+      };
+
+      function safeJSONParse(value, fallback) {
+        try {
+          return JSON.parse(value || 'null') ?? fallback;
+        } catch (error) {
+          return fallback;
+        }
+      }
+
+      function loadJSON(key, fallback) {
+        const raw = localStorage.getItem(key);
+        return safeJSONParse(raw, fallback);
+      }
+
+      function saveJSON(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function loadAppState() {
+        state.settings = { ...DEFAULT_SETTINGS, ...loadJSON(STORAGE_KEYS.settings, DEFAULT_SETTINGS) };
+        state.queue = Array.isArray(loadJSON(STORAGE_KEYS.queue, [])) ? loadJSON(STORAGE_KEYS.queue, []) : [];
+        state.favorites = Array.isArray(loadJSON(STORAGE_KEYS.favorites, [])) ? loadJSON(STORAGE_KEYS.favorites, []) : [];
+        state.playlists = Array.isArray(loadJSON(STORAGE_KEYS.playlists, [])) ? loadJSON(STORAGE_KEYS.playlists, []) : [];
+        state.history = Array.isArray(loadJSON(STORAGE_KEYS.history, [])) ? loadJSON(STORAGE_KEYS.history, []) : [];
+        state.searchHistory = Array.isArray(loadJSON(STORAGE_KEYS.searches, [])) ? loadJSON(STORAGE_KEYS.searches, []) : [];
+        const savedTrack = loadJSON(STORAGE_KEYS.currentTrack, null);
+        state.currentTrack = savedTrack && typeof savedTrack === 'object' ? savedTrack : null;
+
+        let index = -1;
+        if (state.currentTrack && state.queue.length) {
+          index = state.queue.findIndex((track) => track.id === state.currentTrack.id);
+        }
+        state.queueIndex = index >= 0 ? index : (state.queue.length > 0 ? 0 : -1);
+      }
+
+      function persistState() {
+        saveJSON(STORAGE_KEYS.settings, state.settings);
+        if (state.settings.rememberQueue) {
+          saveJSON(STORAGE_KEYS.queue, state.queue);
+        }
+        saveJSON(STORAGE_KEYS.favorites, state.favorites);
+        saveJSON(STORAGE_KEYS.playlists, state.playlists);
+        saveJSON(STORAGE_KEYS.history, state.history);
+        saveJSON(STORAGE_KEYS.searches, state.searchHistory);
+        saveJSON(STORAGE_KEYS.currentTrack, state.currentTrack);
+      }
+
+      function normalizeInstanceUrl(value) {
+        if (!value || typeof value !== 'string') return null;
+        const candidate = value.trim();
+        if (!candidate) return null;
+        try {
+          const url = new URL(candidate);
+          if (url.protocol !== 'https:') return null;
+          if (url.pathname && url.pathname !== '/') return null;
+          if (url.search || url.hash) return null;
+          return url.origin;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function sanitizeInstance() {
+        const cleaned = normalizeInstanceUrl(state.settings.instance) || DEFAULT_SETTINGS.instance;
+        state.settings.instance = cleaned;
+        return cleaned;
+      }
+
+      function makeTrack(data = {}) {
+        const id = typeof data.id === 'string' ? data.id.trim() : '';
+        return {
+          id: id || data.videoId || '',
+          title: data.title || id || 'Untitled track',
+          artist: data.artist || '',
+          thumbnail: data.thumbnail || '',
+          sourceUrl: data.sourceUrl || '',
+          addedAt: data.addedAt || Date.now(),
+          lastPlayedAt: data.lastPlayedAt || Date.now(),
+          playCount: Number(data.playCount) || 0
+        };
+      }
+
+      function toTrackRecord(track) {
+        return {
+          id: track.id,
+          title: track.title,
+          artist: track.artist || '',
+          thumbnail: track.thumbnail || '',
+          sourceUrl: track.sourceUrl || '',
+          addedAt: track.addedAt || Date.now(),
+          lastPlayedAt: track.lastPlayedAt || Date.now(),
+          playCount: Number(track.playCount) || 0
+        };
+      }
+
+      function extractVideoId(input) {
+        if (typeof input !== 'string') return null;
+        const trimmed = input.trim();
+        if (!trimmed) return null;
+
+        if (/^[A-Za-z0-9_-]{11}$/.test(trimmed)) {
+          return trimmed;
+        }
+
+        try {
+          const url = new URL(trimmed);
+          const host = url.hostname.toLowerCase();
+          const path = url.pathname.toLowerCase();
+
+          if (url.protocol === 'javascript:' || url.protocol === 'data:' || url.protocol === 'file:') {
+            return null;
+          }
+
+          const v = url.searchParams.get('v');
+          if (v && /^[A-Za-z0-9_-]{11}$/.test(v)) {
+            return v;
+          }
+
+          if (host.includes('youtube.com') || host.includes('youtu.be') || host.includes('invidious')) {
+            if (path.includes('/embed/')) {
+              const id = path.split('/embed/')[1]?.split('/')[0];
+              if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return id;
+            }
+            if (path.includes('/watch')) {
+              const id = url.searchParams.get('v');
+              if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return id;
+            }
+          }
+        } catch (error) {
+          // Ignore malformed URLs and fall back to the plain ID check below.
+        }
+
+        return null;
+      }
+
+      function createSearchUrl(query) {
+        const base = sanitizeInstance();
+        return `${base}/search?q=${encodeURIComponent(query.trim())}`;
+      }
+
+      function createPlayerUrl(videoId, mode = state.settings.defaultPlayerMode) {
+        const base = sanitizeInstance();
+        const params = new URLSearchParams();
+        params.set('autoplay', state.settings.autoplay ? '1' : '0');
+        if (state.settings.localProxy) params.set('local', 'true');
+        if (mode === 'listen') params.set('listen', '1');
+        return `${base}/embed/${videoId}?${params.toString()}`;
+      }
+
+      function createWatchUrl(videoId) {
+        const base = sanitizeInstance();
+        return `${base}/watch?v=${videoId}`;
+      }
+
+      function openView(viewName) {
+        state.currentView = viewName;
+        document.querySelectorAll('.view').forEach((el) => el.classList.toggle('active', el.id === `${viewName}View`));
+        document.querySelectorAll('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === viewName));
+        const titles = {
+          home: 'Home',
+          search: 'Search',
+          favorites: 'Favorites',
+          playlists: 'Playlists',
+          history: 'History',
+          settings: 'Settings'
+        };
+        els.viewTitle.textContent = titles[viewName] || 'Home';
+      }
+
+      function getRecentTrackSummary() {
+        if (!state.currentTrack) return 'Add a track to start';
+        return `${state.currentTrack.artist ? `${state.currentTrack.artist} · ` : ''}${state.currentTrack.title}`;
+      }
+
+      function renderMetrics() {
+        els.queueMetric.textContent = String(state.queue.length);
+        els.favoritesMetric.textContent = String(state.favorites.length);
+        els.historyMetric.textContent = String(state.history.length);
+        els.playlistsMetric.textContent = String(state.playlists.length);
+      }
+
+      function renderNowPlayingBar() {
+        if (!state.currentTrack) {
+          els.nowPlayingTitle.textContent = 'Nothing playing';
+          els.nowPlayingMeta.textContent = 'Add a track to start';
+          els.playerCover.textContent = '♫';
+          return;
+        }
+
+        const track = state.currentTrack;
+        els.nowPlayingTitle.textContent = track.title || track.id;
+        els.nowPlayingMeta.textContent = track.artist ? `${track.artist} • ${track.id}` : track.id;
+        els.playerCover.textContent = (track.title || 'M').slice(0, 1).toUpperCase();
+      }
+
+      function renderCurrentTrackCard() {
+        if (!state.currentTrack) {
+          els.continueListeningCard.className = 'empty-state';
+          els.continueListeningCard.textContent = 'No current track yet. Add a song or paste a YouTube or Invidious URL to begin.';
+          els.currentTrackPill.textContent = 'No track';
+          return;
+        }
+
+        const track = state.currentTrack;
+        els.currentTrackPill.textContent = track.title || track.id;
+        els.continueListeningCard.className = 'panel';
+        els.continueListeningCard.style.padding = '18px';
+        els.continueListeningCard.innerHTML = `
+          <div class="section-header" style="margin-bottom: 8px;">
+            <h4 style="margin: 0;">${escapeHTML(track.title || track.id)}</h4>
+            <span class="pill">${state.settings.defaultPlayerMode}</span>
+          </div>
+          <p style="margin: 0 0 12px; color: var(--muted);">${escapeHTML(track.artist || 'No artist entered')}</p>
+          <div class="inline-actions">
+            <button class="primary-btn" type="button" data-track-id="${track.id}" data-action="play-current">Play now</button>
+            <button class="ghost-btn" type="button" data-action="toggle-favorite" data-track-id="${track.id}">${isFavorite(track.id) ? 'Unfavorite' : 'Favorite'}</button>
+            <button class="ghost-btn" type="button" data-action="queue-track" data-track-id="${track.id}">Queue</button>
+          </div>
+        `;
+      }
+
+      function renderSearchHistory() {
+        if (!state.searchHistory.length) {
+          els.recentSearchChips.innerHTML = '<span class="inline-info">No recent searches yet.</span>';
+          return;
+        }
+        els.recentSearchChips.innerHTML = state.searchHistory.slice(0, 8).map((term) => `
+          <button class="chip" type="button" data-search-term="${escapeAttribute(term)}">${escapeHTML(term)}</button>
+        `).join('');
+      }
+
+      function renderHomeLists() {
+        const latest = state.history.slice(0, 4);
+        els.recentHistoryList.innerHTML = latest.length
+          ? latest.map((entry) => `
+              <div class="track-item">
+                <div class="track-main">
+                  <strong>${escapeHTML(entry.track.title || entry.track.id)}</strong>
+                  <span>${escapeHTML(entry.track.artist || 'No artist')}</span>
+                </div>
+                <div class="track-actions">
+                  <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${entry.track.id}">Play</button>
+                </div>
+              </div>
+            `).join('')
+          : '<div class="empty-state">No recent tracks loaded yet.</div>';
+
+        const favorites = state.favorites.slice(0, 4);
+        els.homeFavoritesList.innerHTML = favorites.length
+          ? favorites.map((track) => `
+              <div class="track-item">
+                <div class="track-main">
+                  <strong>${escapeHTML(track.title || track.id)}</strong>
+                  <span>${escapeHTML(track.artist || 'No artist')}</span>
+                </div>
+                <div class="track-actions">
+                  <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${track.id}">Play</button>
+                </div>
+              </div>
+            `).join('')
+          : '<div class="empty-state">No favorites yet.</div>';
+
+        const playlists = state.playlists.slice(0, 4);
+        els.homePlaylistsList.innerHTML = playlists.length
+          ? playlists.map((playlist) => `
+              <div class="track-item">
+                <div class="track-main">
+                  <strong>${escapeHTML(playlist.name)}</strong>
+                  <span>${playlist.tracks.length} tracks</span>
+                </div>
+                <div class="track-actions">
+                  <button class="tiny-btn" type="button" data-action="load-playlist" data-playlist-id="${playlist.id}">Open</button>
+                </div>
+              </div>
+            `).join('')
+          : '<div class="empty-state">No playlists yet.</div>';
+      }
+
+      function renderQueue() {
+        if (!state.queue.length) {
+          els.queueList.innerHTML = '<div class="empty-state">Queue is empty. Add a track to start listening.</div>';
+          return;
+        }
+
+        els.queueList.innerHTML = state.queue.map((track, index) => `
+          <div class="queue-item ${index === state.queueIndex ? 'active' : ''}">
+            <div class="queue-main">
+              <strong>${escapeHTML(track.title || track.id)}</strong>
+              <span>${escapeHTML(track.artist || 'No artist')}</span>
+            </div>
+            <div class="mini-actions">
+              <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${track.id}">Play</button>
+              <button class="tiny-btn" type="button" data-action="remove-queue" data-track-id="${track.id}">Remove</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderFavorites() {
+        const items = [...state.favorites].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+        if (!items.length) {
+          els.favoritesList.innerHTML = '<div class="empty-state">No favorites yet. Save a track you want to keep.</div>';
+          return;
+        }
+
+        els.favoritesList.innerHTML = items.map((track) => `
+          <div class="favorite-item">
+            <div class="favorite-main">
+              <strong>${escapeHTML(track.title || track.id)}</strong>
+              <span>${escapeHTML(track.artist || 'No artist')} • ${escapeHTML(track.id)}</span>
+            </div>
+            <div class="favorite-actions">
+              <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${track.id}">Play</button>
+              <button class="tiny-btn" type="button" data-action="queue-track" data-track-id="${track.id}">Queue</button>
+              <button class="tiny-btn" type="button" data-action="toggle-favorite" data-track-id="${track.id}">Unfavorite</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderHistory() {
+        if (!state.history.length) {
+          els.historyList.innerHTML = '<div class="empty-state">History is empty. Loading a track records it here.</div>';
+          return;
+        }
+
+        els.historyList.innerHTML = state.history.map((entry) => `
+          <div class="history-item">
+            <div class="history-main">
+              <strong>${escapeHTML(entry.track.title || entry.track.id)}</strong>
+              <span>${escapeHTML(entry.track.artist || 'No artist')} • ${new Date(entry.playedAt).toLocaleDateString()}</span>
+            </div>
+            <div class="history-actions">
+              <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${entry.track.id}">Replay</button>
+              <button class="tiny-btn" type="button" data-action="queue-track" data-track-id="${entry.track.id}">Queue</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderPlaylists() {
+        if (!state.playlists.length) {
+          els.playlistsList.innerHTML = '<div class="empty-state">No playlists yet. Create one to organize your queue.</div>';
+          return;
+        }
+
+        els.playlistsList.innerHTML = state.playlists.map((playlist) => `
+          <div class="playlist-item">
+            <div class="playlist-main">
+              <strong>${escapeHTML(playlist.name)}</strong>
+              <span>${playlist.tracks.length} tracks</span>
+            </div>
+            <div class="history-actions">
+              <button class="tiny-btn" type="button" data-action="load-playlist" data-playlist-id="${playlist.id}">Open</button>
+              <button class="tiny-btn" type="button" data-action="append-playlist" data-playlist-id="${playlist.id}">Queue</button>
+              <button class="tiny-btn" type="button" data-action="delete-playlist" data-playlist-id="${playlist.id}">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderSettings() {
+        const settings = state.settings;
+        els.instanceInput.value = settings.instance;
+        els.playerModeInput.value = settings.defaultPlayerMode;
+        els.themeInput.value = settings.theme;
+        els.historyLimitInput.value = settings.historyLimit;
+        document.querySelectorAll('.toggle').forEach((toggle) => {
+          const key = toggle.dataset.toggle;
+          const isOn = !!settings[key];
+          toggle.classList.toggle('on', isOn);
+          toggle.setAttribute('aria-pressed', String(isOn));
+        });
+      }
+
+      function renderAll() {
+        renderMetrics();
+        renderNowPlayingBar();
+        renderCurrentTrackCard();
+        renderSearchHistory();
+        renderHomeLists();
+        renderQueue();
+        renderFavorites();
+        renderHistory();
+        renderPlaylists();
+        renderSettings();
+        updatePlayerSource();
+      }
+
+      function escapeHTML(text) {
+        return String(text ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function escapeAttribute(value) {
+        return escapeHTML(value).replace(/`/g, '&#96;');
+      }
+
+      function isFavorite(trackId) {
+        return state.favorites.some((track) => track.id === trackId);
+      }
+
+      function ensureTrackInQueue(track) {
+        const existing = state.queue.find((item) => item.id === track.id);
+        if (!existing) {
+          state.queue.push(track);
+        }
+      }
+
+      function setCurrentTrack(track, options = {}) {
+        if (!track || !track.id) return;
+        const safeTrack = makeTrack(track);
+        state.currentTrack = safeTrack;
+        const queueIndex = state.queue.findIndex((item) => item.id === safeTrack.id);
+        state.queueIndex = queueIndex >= 0 ? queueIndex : state.queueIndex;
+
+        if (options.recordHistory !== false) {
+          const existingHistory = state.history.find((entry) => entry.track.id === safeTrack.id);
+          if (existingHistory) {
+            state.history = state.history.filter((entry) => entry.track.id !== safeTrack.id);
+          }
+          state.history.unshift({
+            track: toTrackRecord(safeTrack),
+            playedAt: Date.now()
+          });
+          state.history = state.history.slice(0, state.settings.historyLimit || 100);
+        }
+        persistState();
+        renderAll();
+      }
+
+      function addTrackToQueue(track, shouldPlay = false) {
+        const safeTrack = makeTrack(track);
+        if (!safeTrack.id) return alert('A valid video ID or URL is required.');
+
+        const existing = state.queue.find((item) => item.id === safeTrack.id);
+        if (!existing) {
+          state.queue.push(safeTrack);
+        }
+
+        if (shouldPlay || state.queue.length === 1) {
+          const index = state.queue.findIndex((item) => item.id === safeTrack.id);
+          state.queueIndex = index >= 0 ? index : state.queue.length - 1;
+          state.currentTrack = safeTrack;
+        }
+
+        persistState();
+        renderAll();
+      }
+
+      function removeQueue(trackId) {
+        state.queue = state.queue.filter((track) => track.id !== trackId);
+        if (state.currentTrack && state.currentTrack.id === trackId) {
+          state.currentTrack = state.queue[state.queueIndex] || state.queue[0] || null;
+        }
+        if (state.queueIndex >= state.queue.length) {
+          state.queueIndex = state.queue.length - 1;
+        }
+        persistState();
+        renderAll();
+      }
+
+      function previousQueueItem() {
+        if (!state.queue.length) return;
+        const nextIndex = state.queueIndex <= 0 ? state.queue.length - 1 : state.queueIndex - 1;
+        state.queueIndex = nextIndex;
+        state.currentTrack = state.queue[nextIndex];
+        persistState();
+        renderAll();
+      }
+
+      function nextQueueItem() {
+        if (!state.queue.length) return;
+        const nextIndex = state.queueIndex >= state.queue.length - 1 ? 0 : state.queueIndex + 1;
+        state.queueIndex = nextIndex;
+        state.currentTrack = state.queue[nextIndex];
+        persistState();
+        renderAll();
+      }
+
+      function updatePlayerSource() {
+        if (!state.currentTrack) {
+          els.playerIframe.src = '';
+          return;
+        }
+        const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+        const mode = state.settings.defaultPlayerMode || 'listen';
+        els.playerIframe.src = createPlayerUrl(videoId, mode);
+        els.playerIframe.title = `Invidious ${mode} player`;
+        const modeBtn = document.getElementById('togglePlayerModeBtn');
+        if (modeBtn) {
+          modeBtn.textContent = mode === 'listen' ? 'Switch to Video' : 'Switch to Listen';
+        }
+      }
+
+      function togglePlayerMode() {
+        state.settings.defaultPlayerMode = state.settings.defaultPlayerMode === 'listen' ? 'video' : 'listen';
+        if (state.currentTrack) {
+          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+          els.playerIframe.src = createPlayerUrl(videoId, state.settings.defaultPlayerMode);
+        }
+        persistState();
+        renderAll();
+      }
+
+      function handleSearch(query) {
+        const clean = (query || '').trim();
+        if (!clean) {
+          alert('Search query cannot be empty.');
+          return;
+        }
+        state.searchHistory = [clean, ...state.searchHistory.filter((item) => item !== clean)].slice(0, 20);
+        const url = createSearchUrl(clean);
+        els.searchIframe.src = url;
+        persistState();
+        renderAll();
+      }
+
+      function handleTrackInput(input, extraOptions = {}) {
+        const videoId = extractVideoId(input);
+        if (!videoId) {
+          alert('Unsupported or malformed input. Paste a valid YouTube URL, Invidious URL, or 11-character video ID.');
+          return null;
+        }
+
+        const track = makeTrack({
+          id: videoId,
+          title: extraOptions.title || videoId,
+          artist: extraOptions.artist || '',
+          sourceUrl: input,
+          addedAt: Date.now(),
+          lastPlayedAt: Date.now(),
+          playCount: 1
+        });
+
+        if (extraOptions.toFavorite) {
+          if (!isFavorite(track.id)) {
+            state.favorites.unshift(track);
+          }
+        }
+
+        if (extraOptions.toQueue) {
+          addTrackToQueue(track, extraOptions.playNow || false);
+        }
+
+        if (extraOptions.playNow) {
+          setCurrentTrack(track, { recordHistory: true });
+          if (!state.queue.some((item) => item.id === track.id)) {
+            state.queue.push(track);
+          }
+          state.queueIndex = state.queue.findIndex((item) => item.id === track.id);
+        }
+
+        persistState();
+        renderAll();
+        return track;
+      }
+
+      function addFavorite(trackId) {
+        const track = state.queue.find((item) => item.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track || state.favorites.find((item) => item.id === trackId);
+        if (!track) return;
+        if (!isFavorite(track.id)) {
+          state.favorites.unshift(toTrackRecord(track));
+        }
+        persistState();
+        renderAll();
+      }
+
+      function removeFavorite(trackId) {
+        state.favorites = state.favorites.filter((track) => track.id !== trackId);
+        persistState();
+        renderAll();
+      }
+
+      function savePlaylist(name) {
+        const playlistName = (name || '').trim();
+        if (!playlistName) {
+          alert('Playlist name is required.');
+          return;
+        }
+        const existing = state.playlists.find((playlist) => playlist.name.toLowerCase() === playlistName.toLowerCase());
+        if (existing) {
+          alert('A playlist with that name already exists.');
+          return;
+        }
+        const playlist = {
+          id: `playlist-${Date.now()}`,
+          name: playlistName,
+          description: '',
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          tracks: []
+        };
+        state.playlists.unshift(playlist);
+        els.playlistForm.style.display = 'none';
+        els.playlistNameInput.value = '';
+        persistState();
+        renderAll();
+      }
+
+      function deletePlaylist(playlistId) {
+        if (!confirm('Delete this playlist?')) return;
+        state.playlists = state.playlists.filter((playlist) => playlist.id !== playlistId);
+        persistState();
+        renderAll();
+      }
+
+      function appendPlaylistToQueue(playlistId) {
+        const playlist = state.playlists.find((item) => item.id === playlistId);
+        if (!playlist) return;
+        playlist.tracks.forEach((track) => addTrackToQueue(track));
+      }
+
+      function exportBackup() {
+        const backup = {
+          app: 'Musify Lite',
+          formatVersion: 1,
+          exportedAt: new Date().toISOString(),
+          settings: state.settings,
+          queue: state.queue,
+          favorites: state.favorites,
+          playlists: state.playlists,
+          history: state.history,
+          searchHistory: state.searchHistory
+        };
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'musify-lite-backup.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function importBackup(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(String(reader.result));
+            if (!data || data.app !== 'Musify Lite' || data.formatVersion !== 1) {
+              throw new Error('Unsupported backup format');
+            }
+            state.settings = { ...DEFAULT_SETTINGS, ...(data.settings || {}) };
+            state.queue = Array.isArray(data.queue) ? data.queue : [];
+            state.favorites = Array.isArray(data.favorites) ? data.favorites : [];
+            state.playlists = Array.isArray(data.playlists) ? data.playlists : [];
+            state.history = Array.isArray(data.history) ? data.history : [];
+            state.searchHistory = Array.isArray(data.searchHistory) ? data.searchHistory : [];
+            persistState();
+            renderAll();
+            alert('Backup imported successfully.');
+          } catch (error) {
+            alert('Invalid import file or unsupported backup format.');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function resetAllData() {
+        if (!confirm('Reset all library data and settings? This cannot be undone.')) return;
+        state.settings = { ...DEFAULT_SETTINGS };
+        state.queue = [];
+        state.queueIndex = -1;
+        state.favorites = [];
+        state.playlists = [];
+        state.history = [];
+        state.searchHistory = [];
+        state.currentTrack = null;
+        persistState();
+        renderAll();
+      }
+
+      function handleQuickAdd(formData) {
+        const urlValue = formData.get('url');
+        const titleValue = formData.get('title');
+        const artistValue = formData.get('artist');
+        const track = handleTrackInput(urlValue, {
+          title: titleValue,
+          artist: artistValue,
+          toQueue: true,
+          playNow: true
+        });
+        if (track) {
+          els.quickAddUrl.value = '';
+          els.quickAddTitle.value = '';
+          els.quickAddArtist.value = '';
+        }
+      }
+
+      function saveSettings() {
+        const normalizedInstance = normalizeInstanceUrl(els.instanceInput.value);
+        if (!normalizedInstance) {
+          alert('The Invidious instance must be a valid HTTPS origin without a path or query string.');
+          return;
+        }
+        state.settings.instance = normalizedInstance;
+        state.settings.defaultPlayerMode = els.playerModeInput.value;
+        state.settings.theme = els.themeInput.value;
+        state.settings.historyLimit = Number(els.historyLimitInput.value) || DEFAULT_SETTINGS.historyLimit;
+        state.settings.autoplay = document.querySelector('[data-toggle="autoplay"]').classList.contains('on');
+        state.settings.localProxy = document.querySelector('[data-toggle="localProxy"]').classList.contains('on');
+        state.settings.rememberQueue = document.querySelectorAll('[data-toggle="rememberQueue"]')[0].classList.contains('on');
+        document.body.dataset.theme = state.settings.theme;
+        persistState();
+        renderAll();
+      }
+
+      document.querySelectorAll('.nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => openView(btn.dataset.view));
+      });
+
+      document.querySelectorAll('[data-action]').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          const action = event.currentTarget.dataset.action;
+          const trackId = event.currentTarget.dataset.trackId;
+          const playlistId = event.currentTarget.dataset.playlistId;
+          const searchTerm = event.currentTarget.dataset.searchTerm;
+
+          if (action === 'search-dock') openView('search');
+          if (action === 'paste-url') document.getElementById('pastedResultUrl').focus();
+          if (action === 'open-instance') window.open(sanitizeInstance(), '_blank', 'noopener');
+          if (action === 'play-track' && trackId) {
+            const item = state.queue.find((track) => track.id === trackId) || state.favorites.find((track) => track.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track;
+            if (item) {
+              setCurrentTrack(item);
+            }
+          }
+          if (action === 'toggle-favorite' && trackId) {
+            if (isFavorite(trackId)) {
+              removeFavorite(trackId);
+            } else {
+              addFavorite(trackId);
+            }
+          }
+          if (action === 'queue-track' && trackId) {
+            const item = state.queue.find((track) => track.id === trackId) || state.favorites.find((track) => track.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track;
+            if (item) addTrackToQueue(item, false);
+          }
+          if (action === 'remove-queue' && trackId) removeQueue(trackId);
+          if (action === 'play-current') {
+            if (state.currentTrack) setCurrentTrack(state.currentTrack);
+          }
+          if (action === 'load-playlist' && playlistId) {
+            const playlist = state.playlists.find((item) => item.id === playlistId);
+            if (playlist && playlist.tracks.length) {
+              state.queue = [...state.queue, ...playlist.tracks];
+              state.queueIndex = state.queue.length - playlist.tracks.length;
+              state.currentTrack = playlist.tracks[0];
+              persistState();
+              renderAll();
+            }
+          }
+          if (action === 'append-playlist' && playlistId) appendPlaylistToQueue(playlistId);
+          if (action === 'delete-playlist' && playlistId) deletePlaylist(playlistId);
+          if (searchTerm) {
+            handleSearch(searchTerm);
+          }
+        });
+      });
+
+      document.getElementById('playPreviousBtn').addEventListener('click', previousQueueItem);
+      document.getElementById('playNextBtn').addEventListener('click', nextQueueItem);
+      document.getElementById('clearQueueBtn').addEventListener('click', () => {
+        state.queue = [];
+        state.queueIndex = -1;
+        if (state.currentTrack && !state.queue.length) {
+          state.currentTrack = null;
+        }
+        persistState();
+        renderAll();
+      });
+      document.getElementById('quickAddBtn').addEventListener('click', () => openView('home'));
+      document.getElementById('openSearchTabBtn').addEventListener('click', () => window.open(createSearchUrl(''), '_blank', 'noopener'));
+      document.getElementById('reloadPlayerBtn').addEventListener('click', () => {
+        if (state.currentTrack) {
+          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+          els.playerIframe.src = createPlayerUrl(videoId, state.settings.defaultPlayerMode);
+        }
+      });
+      document.getElementById('togglePlayerModeBtn').addEventListener('click', togglePlayerMode);
+      document.getElementById('openWatchBtn').addEventListener('click', () => {
+        if (state.currentTrack) {
+          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+          window.open(createWatchUrl(videoId), '_blank', 'noopener');
+        }
+      });
+
+      document.getElementById('searchForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        handleSearch(els.searchInput.value);
+      });
+
+      document.getElementById('clearSearchBtn').addEventListener('click', () => {
+        els.searchInput.value = '';
+        els.searchIframe.src = '';
+      });
+      document.getElementById('reloadSearchBtn').addEventListener('click', () => {
+        const query = els.searchInput.value.trim();
+        if (query) {
+          els.searchIframe.src = createSearchUrl(query);
+        }
+      });
+      document.getElementById('openSearchNewTabBtn').addEventListener('click', () => {
+        const query = els.searchInput.value.trim();
+        window.open(createSearchUrl(query || ''), '_blank', 'noopener');
+      });
+      document.getElementById('returnNowPlayingBtn').addEventListener('click', () => {
+        if (state.currentTrack) {
+          openView('home');
+        } else {
+          openView('home');
+        }
+      });
+      document.getElementById('toggleFullscreenBtn').addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      els.searchUrlForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const input = els.pastedResultUrl.value;
+        const videoId = extractVideoId(input);
+        if (!videoId) {
+          alert('Unsupported or malformed input. Paste a valid YouTube or Invidious URL or 11-character video ID.');
+          return;
+        }
+        const track = handleTrackInput(input, {
+          title: '',
+          artist: '',
+          toQueue: true,
+          playNow: true,
+          toFavorite: false
+        });
+        if (track) {
+          els.pastedResultUrl.value = '';
+          openView('home');
+        }
+      });
+
+      els.quickAddForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const urlValue = els.quickAddUrl.value.trim();
+        const titleValue = els.quickAddTitle.value.trim();
+        const artistValue = els.quickAddArtist.value.trim();
+        const track = handleTrackInput(urlValue, {
+          title: titleValue || '',
+          artist: artistValue || '',
+          toQueue: true,
+          playNow: true,
+          toFavorite: false
+        });
+        if (track) {
+          els.quickAddUrl.value = '';
+          els.quickAddTitle.value = '';
+          els.quickAddArtist.value = '';
+        }
+      });
+
+      document.getElementById('createPlaylistBtn').addEventListener('click', () => {
+        els.playlistForm.style.display = 'grid';
+        els.playlistNameInput.focus();
+      });
+      document.getElementById('cancelPlaylistBtn').addEventListener('click', () => {
+        els.playlistForm.style.display = 'none';
+        els.playlistNameInput.value = '';
+      });
+      els.playlistForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        savePlaylist(els.playlistNameInput.value);
+      });
+      document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+        state.history = [];
+        persistState();
+        renderAll();
+      });
+      document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+      document.getElementById('exportBackupBtn').addEventListener('click', exportBackup);
+      document.getElementById('importBackupBtn').addEventListener('click', () => els.backupFileInput.click());
+      document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
+      els.backupFileInput.addEventListener('change', (event) => importBackup(event.target.files[0]));
+      document.getElementById('favoriteSortBtn').addEventListener('click', () => {
+        state.favorites = [...state.favorites].sort((a, b) => (state.sortMode === 'date' ? (b.addedAt || 0) - (a.addedAt || 0) : (a.title || '').localeCompare(b.title || '')));
+        state.sortMode = state.sortMode === 'date' ? 'title' : 'date';
+        document.getElementById('favoriteSortBtn').textContent = state.sortMode === 'date' ? 'Sort by title' : 'Sort by date';
+        persistState();
+        renderAll();
+      });
+
+      document.querySelectorAll('.toggle').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          const key = toggle.dataset.toggle;
+          toggle.classList.toggle('on');
+          const isOn = toggle.classList.contains('on');
+          state.settings[key] = isOn;
+          persistState();
+          renderAll();
+        });
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        try {
+          loadAppState();
+        } catch (error) {
+          warning('Storage was unavailable. Continuing with defaults.');
+        }
+        document.body.dataset.theme = state.settings.theme || DEFAULT_SETTINGS.theme;
+        if (!state.currentTrack && state.queue.length) {
+          state.currentTrack = state.queue[0];
+          state.queueIndex = 0;
+        }
+        renderAll();
+        sanitizeInstance();
+        if (state.searchHistory.length) {
+          els.searchInput.value = state.searchHistory[0];
+        }
+      });
+
+      function warning(message) {
+        console.warn(message);
+      }
+    </script>
+  </body>
+</html>
