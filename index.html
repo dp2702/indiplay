@@ -3,26 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Musify Lite - a GitHub Pages-friendly music library built around Invidious search and playback."
-    />
+    <meta name="description" content="Musify Lite — a static music library that uses Invidious for search and playback." />
     <title>Musify Lite</title>
     <style>
       :root {
-        --background: #0b1020;
-        --surface: #131a2d;
-        --surface-2: #1a2340;
-        --text: #f4f7ff;
-        --muted: #9aa6c2;
+        --bg: #0b1020;
+        --surface: #121b30;
+        --surface-2: #1b2846;
+        --panel: rgba(18, 27, 48, 0.9);
+        --text: #edf5ff;
+        --muted: #9aa7c2;
         --accent: #7c5cff;
         --accent-2: #21c7d9;
         --danger: #ff5d73;
         --success: #36d399;
-        --border: rgba(255, 255, 255, 0.1);
-        --shadow: rgba(3, 7, 18, 0.5);
+        --border: rgba(255, 255, 255, 0.09);
+        --shadow: rgba(5, 10, 20, 0.42);
         --radius: 16px;
-        --header-height: 72px;
       }
 
       * { box-sizing: border-box; }
@@ -30,33 +27,35 @@
       html, body {
         margin: 0;
         min-height: 100%;
-        background: var(--background);
+        background: var(--bg);
         color: var(--text);
         font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       body[data-theme="light"] {
-        --background: #eef4ff;
+        --bg: #eef4ff;
         --surface: #ffffff;
-        --surface-2: #e5ebff;
-        --text: #182033;
-        --muted: #58657f;
-        --accent: #5d4dff;
-        --accent-2: #0b9cad;
-        --danger: #d93f5d;
-        --success: #1fae72;
-        --border: rgba(24, 32, 51, 0.08);
-        --shadow: rgba(17, 24, 39, 0.12);
+        --surface-2: #e7edf8;
+        --panel: #ffffff;
+        --text: #1a2336;
+        --muted: #5c6f8d;
+        --accent: #5f4af0;
+        --accent-2: #1098b8;
+        --danger: #d1536d;
+        --success: #1da570;
+        --border: rgba(26, 35, 54, 0.09);
+        --shadow: rgba(28, 39, 61, 0.12);
       }
 
       button, input, select, textarea {
         font: inherit;
       }
 
-      a {
-        color: var(--accent-2);
-        text-decoration: none;
+      button {
+        cursor: pointer;
       }
+
+      a { color: var(--accent-2); text-decoration: none; }
 
       .sr-only {
         position: absolute;
@@ -72,15 +71,15 @@
 
       .app-shell {
         display: grid;
-        grid-template-columns: 220px minmax(0, 1fr) 320px;
+        grid-template-columns: 230px minmax(0, 1fr) 320px;
         min-height: 100vh;
-        background: linear-gradient(180deg, rgba(14, 20, 34, 0.95), rgba(11, 16, 32, 1));
+        background: linear-gradient(180deg, rgba(10, 16, 30, 0.94), rgba(11, 16, 32, 1));
       }
 
       .sidebar {
-        background: rgba(19, 26, 45, 0.9);
+        background: rgba(18, 27, 48, 0.86);
         border-right: 1px solid var(--border);
-        padding: 18px 14px;
+        padding: 20px 14px;
         display: flex;
         flex-direction: column;
         gap: 18px;
@@ -90,16 +89,15 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 10px 12px;
-        margin-bottom: 8px;
+        padding: 8px 10px;
       }
 
       .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
         display: grid;
         place-items: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
         background: linear-gradient(135deg, var(--accent), var(--accent-2));
         font-weight: 800;
         color: white;
@@ -107,8 +105,7 @@
 
       .brand h1 {
         margin: 0;
-        font-size: 1.06rem;
-        letter-spacing: 0.02em;
+        font-size: 1.08rem;
       }
 
       .nav-list {
@@ -117,53 +114,37 @@
         gap: 8px;
       }
 
-      .nav-btn,
-      .action-btn,
-      .chip,
-      .ghost-btn,
-      .primary-btn,
-      .danger-btn,
-      .tiny-btn {
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: transparent;
-        color: var(--text);
-        cursor: pointer;
-        transition: 0.2s ease;
-      }
-
       .nav-btn {
         width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--muted);
         text-align: left;
         padding: 12px 12px;
         font-weight: 600;
-        color: var(--muted);
+        transition: all 0.2s ease;
       }
 
       .nav-btn.active {
         background: rgba(124, 92, 255, 0.12);
-        border-color: rgba(124, 92, 255, 0.6);
         color: var(--text);
+        border-color: rgba(124, 92, 255, 0.5);
       }
 
-      .nav-btn:hover,
-      .action-btn:hover,
-      .chip:hover,
-      .primary-btn:hover,
-      .ghost-btn:hover,
-      .danger-btn:hover,
-      .tiny-btn:hover {
+      .nav-btn:hover, .primary-btn:hover, .ghost-btn:hover, .danger-btn:hover, .tiny-btn:hover, .chip:hover {
         transform: translateY(-1px);
       }
 
       .sidebar-meta {
         margin-top: auto;
-        padding: 14px 12px;
+        padding: 12px 10px;
         border: 1px solid var(--border);
-        border-radius: var(--radius);
+        border-radius: 12px;
         background: rgba(255, 255, 255, 0.02);
         color: var(--muted);
-        font-size: 0.88rem;
+        font-size: 0.86rem;
+        line-height: 1.5;
       }
 
       .main {
@@ -173,22 +154,22 @@
       }
 
       .topbar {
-        height: var(--header-height);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px 24px;
+        gap: 14px;
+        padding: 16px 20px;
         border-bottom: 1px solid var(--border);
-        background: rgba(19, 26, 45, 0.65);
+        background: rgba(18, 27, 48, 0.8);
         backdrop-filter: blur(12px);
         position: sticky;
         top: 0;
-        z-index: 10;
+        z-index: 20;
       }
 
       .topbar h2 {
         margin: 0;
-        font-size: clamp(1.2rem, 2vw, 1.6rem);
+        font-size: clamp(1.2rem, 2vw, 1.7rem);
       }
 
       .topbar-actions {
@@ -197,89 +178,45 @@
         gap: 8px;
       }
 
-      .primary-btn,
-      .action-btn,
-      .ghost-btn,
-      .danger-btn,
-      .tiny-btn {
-        padding: 10px 14px;
-        min-height: 42px;
-      }
-
-      .primary-btn {
-        background: linear-gradient(135deg, var(--accent), var(--accent-2));
-        border: none;
-        font-weight: 700;
-        color: #fff;
-      }
-
-      .ghost-btn {
-        background: rgba(255, 255, 255, 0.02);
-      }
-
-      .danger-btn {
-        background: rgba(255, 93, 115, 0.08);
-        border-color: rgba(255, 93, 115, 0.4);
-        color: var(--danger);
-      }
-
-      .tiny-btn {
-        padding: 8px 10px;
-        min-height: 36px;
-        font-size: 0.82rem;
-      }
-
       .content {
-        padding: 24px;
-        overflow: auto;
+        padding: 20px 20px 32px;
       }
 
       .view {
         display: none;
-        gap: 20px;
+        gap: 18px;
       }
 
       .view.active {
         display: grid;
       }
 
-      .hero,
-      .card,
-      .panel,
-      .queue-card,
-      .playlist-card,
-      .history-card,
-      .favorite-card,
-      .section-box {
-        background: rgba(19, 26, 45, 0.78);
+      .hero, .panel, .queue-panel, .playlist-card, .section-box {
+        background: var(--panel);
         border: 1px solid var(--border);
         border-radius: var(--radius);
         box-shadow: 0 12px 28px var(--shadow);
       }
 
       .hero {
-        padding: 22px;
         display: grid;
         grid-template-columns: 1.5fr 1fr;
-        gap: 18px;
+        gap: 20px;
+        padding: 22px;
       }
 
       .hero h3 {
-        margin: 0 0 8px;
-        font-size: clamp(1.6rem, 2vw, 2.3rem);
+        margin: 0 0 10px;
+        font-size: clamp(1.8rem, 2.5vw, 2.6rem);
       }
 
       .hero p {
-        margin: 0 0 18px;
+        margin: 0 0 16px;
         color: var(--muted);
-        line-height: 1.5;
+        line-height: 1.6;
       }
 
-      .hero-actions,
-      .action-row,
-      .inline-actions,
-      .chip-stack,
-      .queue-actions {
+      .hero-actions, .inline-actions, .chip-stack, .queue-actions {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
@@ -287,21 +224,38 @@
 
       .metric-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
       }
 
       .metric {
-        padding: 14px;
+        padding: 16px;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .metric span {
+        color: var(--muted);
       }
 
       .metric strong {
         display: block;
-        font-size: 1.2rem;
         margin-top: 8px;
+        font-size: 1.3rem;
+      }
+
+      .grid-2, .grid-3, .settings-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+      .panel {
+        padding: 18px;
       }
 
       .section-header {
@@ -314,35 +268,7 @@
 
       .section-title {
         margin: 0;
-        font-size: 1.15rem;
-      }
-
-      .grid-2,
-      .grid-3 {
-        display: grid;
-        gap: 16px;
-      }
-
-      .grid-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .grid-3 {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .panel {
-        padding: 18px;
-      }
-
-      .panel h4,
-      .card h4,
-      .section-box h4,
-      .playlist-card h4,
-      .history-card h4,
-      .favorite-card h4 {
-        margin: 0 0 14px;
-        font-size: 1rem;
+        font-size: 1.12rem;
       }
 
       .empty-state {
@@ -353,74 +279,7 @@
         line-height: 1.5;
       }
 
-      .track-list,
-      .playlist-list,
-      .history-list,
-      .favorite-list,
-      .queue-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      .track-item,
-      .queue-item,
-      .playlist-item,
-      .history-item,
-      .favorite-item {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        align-items: center;
-        padding: 12px 14px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.015);
-      }
-
-      .track-main,
-      .queue-main,
-      .history-main,
-      .favorite-main {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-      }
-
-      .track-main strong,
-      .queue-main strong,
-      .history-main strong,
-      .favorite-main strong {
-        font-size: 0.96rem;
-      }
-
-      .track-main span,
-      .queue-main span,
-      .history-main span,
-      .favorite-main span {
-        font-size: 0.82rem;
-        color: var(--muted);
-      }
-
-      .track-actions,
-      .queue-actions,
-      .history-actions,
-      .favorite-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .search-box {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 10px;
-      }
-
-      .search-input,
-      .field,
-      .textarea,
-      .select {
+      .field, .select, .search-input, .textarea {
         width: 100%;
         background: rgba(255, 255, 255, 0.02);
         border: 1px solid var(--border);
@@ -429,7 +288,7 @@
         padding: 12px 14px;
       }
 
-      textarea {
+      .textarea {
         min-height: 90px;
         resize: vertical;
       }
@@ -445,16 +304,68 @@
         gap: 12px;
       }
 
-      .checkbox-row {
+      .search-box {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+      }
+
+      .primary-btn, .ghost-btn, .danger-btn, .tiny-btn, .chip {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        transition: all 0.2s ease;
+      }
+
+      .primary-btn, .ghost-btn, .danger-btn {
+        padding: 10px 14px;
+        min-height: 42px;
+      }
+
+      .primary-btn {
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        border: none;
+        font-weight: 700;
+        color: white;
+      }
+
+      .ghost-btn {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .danger-btn {
+        background: rgba(255, 93, 115, 0.08);
+        border-color: rgba(255, 93, 115, 0.32);
+        color: var(--danger);
+      }
+
+      .tiny-btn {
+        padding: 7px 9px;
+        min-height: 34px;
+        font-size: 0.82rem;
+      }
+
+      .chip {
+        padding: 8px 10px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      .chip.active {
+        background: rgba(33, 199, 217, 0.12);
+        border-color: rgba(33, 199, 217, 0.5);
+      }
+
+      .toggle-row {
         display: flex;
-        align-items: center;
         justify-content: space-between;
+        align-items: center;
         gap: 16px;
         padding: 12px 0;
         border-bottom: 1px solid var(--border);
       }
 
-      .checkbox-row:last-child {
+      .toggle-row:last-child {
         border-bottom: none;
       }
 
@@ -463,9 +374,8 @@
         width: 52px;
         height: 30px;
         border-radius: 999px;
-        background: rgba(255,255,255,0.08);
         border: 1px solid var(--border);
-        cursor: pointer;
+        background: rgba(255,255,255,0.08);
       }
 
       .toggle::after {
@@ -488,65 +398,55 @@
         transform: translateX(20px);
       }
 
-      .media-shell {
-        display: grid;
-        gap: 12px;
+      .track-list, .playlist-list, .history-list, .favorite-list, .queue-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
 
-      .player-frame-wrap {
-        position: relative;
-        border-radius: 18px;
-        overflow: hidden;
-        background: #040918;
-        min-height: 420px;
-        border: 1px solid var(--border);
-      }
-
-      .player-iframe,
-      .search-iframe {
-        width: 100%;
-        height: 100%;
-        min-height: 420px;
-        border: 0;
-        background: #050b18;
-      }
-
-      .inline-info {
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-
-      .chip {
-        padding: 8px 10px;
-        background: rgba(255, 255, 255, 0.02);
-      }
-
-      .chip.active {
-        background: rgba(33, 199, 217, 0.12);
-        border-color: rgba(33, 199, 217, 0.5);
-      }
-
-      .pill {
-        display: inline-flex;
+      .track-item, .queue-item, .history-item, .favorite-item, .playlist-item {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
-        padding: 6px 8px;
-        border-radius: 999px;
-        background: rgba(124, 92, 255, 0.12);
-        color: var(--text);
-        font-size: 0.8rem;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.015);
+      }
+
+      .track-main, .history-main, .favorite-main, .queue-main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .track-main strong, .history-main strong, .favorite-main strong, .queue-main strong {
+        font-size: 0.96rem;
+      }
+
+      .track-main span, .history-main span, .favorite-main span, .queue-main span {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+
+      .track-actions, .history-actions, .favorite-actions, .queue-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
       }
 
       .queue-panel {
-        background: rgba(19, 26, 45, 0.68);
-        border-left: 1px solid var(--border);
         padding: 16px 14px;
+        border-left: 1px solid var(--border);
+        background: rgba(18, 27, 48, 0.7);
       }
 
       .queue-panel-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 10px;
         margin-bottom: 14px;
       }
 
@@ -555,31 +455,55 @@
       }
 
       .queue-item.active {
-        background: rgba(124, 92, 255, 0.09);
+        background: rgba(124, 92, 255, 0.08);
         border-color: rgba(124, 92, 255, 0.5);
       }
 
-      .queue-track {
-        width: 100%;
+      .playlist-card {
+        padding: 14px;
       }
 
-      .mini-actions {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
+      .playlist-card h4 {
+        margin: 0;
+      }
+
+      .playlist-card .track-list {
+        margin-top: 12px;
+      }
+
+      .player-shell {
+        display: grid;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      .player-box {
+        border-radius: 18px;
+        overflow: hidden;
+        background: #050c18;
+        border: 1px solid var(--border);
+        min-height: 420px;
+      }
+
+      .player-iframe, .search-iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 420px;
+        border: 0;
+        display: block;
+        background: #050c18;
       }
 
       .sticky-player {
         position: sticky;
         bottom: 0;
-        margin-top: auto;
-        background: rgba(17, 22, 35, 0.92);
+        background: rgba(12, 19, 33, 0.96);
         border-top: 1px solid var(--border);
-        padding: 14px 20px;
+        padding: 12px 20px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 14px;
+        gap: 12px;
       }
 
       .player-summary {
@@ -589,19 +513,17 @@
         min-width: 0;
       }
 
-      .cover-art {
+      .player-cover {
         width: 48px;
         height: 48px;
         border-radius: 14px;
-        background: linear-gradient(135deg, var(--accent), var(--accent-2));
         display: grid;
         place-items: center;
-        font-size: 1.2rem;
-        font-weight: 700;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        font-weight: 800;
       }
 
-      .player-summary strong,
-      .player-summary span {
+      .player-summary strong, .player-summary span {
         display: block;
       }
 
@@ -610,15 +532,19 @@
         font-size: 0.82rem;
       }
 
-      .playlist-form,
-      .lib-form,
-      .settings-grid {
-        display: grid;
-        gap: 12px;
+      .inline-info {
+        color: var(--muted);
+        font-size: 0.88rem;
       }
 
-      .settings-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(124, 92, 255, 0.12);
+        color: var(--text);
+        font-size: 0.8rem;
       }
 
       @media (max-width: 1100px) {
@@ -641,25 +567,14 @@
         .sidebar {
           border-right: none;
           border-bottom: 1px solid var(--border);
-          padding-bottom: 6px;
         }
 
         .nav-list {
-          display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
+          display: grid;
         }
 
-        .content,
-        .topbar {
-          padding-left: 12px;
-          padding-right: 12px;
-        }
-
-        .hero,
-        .grid-2,
-        .grid-3,
-        .field-grid,
-        .settings-grid {
+        .hero, .grid-2, .grid-3, .settings-grid, .field-grid {
           grid-template-columns: 1fr;
         }
 
@@ -670,11 +585,7 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        * {
-          animation: none !important;
-          transition: none !important;
-          scroll-behavior: auto !important;
-        }
+        * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
       }
     </style>
   </head>
@@ -687,17 +598,17 @@
         </div>
 
         <nav class="nav-list" aria-label="Main navigation">
-          <button class="nav-btn active" data-view="home">Home</button>
-          <button class="nav-btn" data-view="search">Search</button>
-          <button class="nav-btn" data-view="favorites">Favorites</button>
-          <button class="nav-btn" data-view="playlists">Playlists</button>
-          <button class="nav-btn" data-view="history">History</button>
-          <button class="nav-btn" data-view="settings">Settings</button>
+          <button class="nav-btn active" data-view="home" type="button">Home</button>
+          <button class="nav-btn" data-view="search" type="button">Search</button>
+          <button class="nav-btn" data-view="favorites" type="button">Favorites</button>
+          <button class="nav-btn" data-view="playlists" type="button">Playlists</button>
+          <button class="nav-btn" data-view="history" type="button">History</button>
+          <button class="nav-btn" data-view="settings" type="button">Settings</button>
         </nav>
 
         <div class="sidebar-meta">
           <strong>Version</strong><br />
-          0.1.0 – static GitHub Pages build
+          0.2.0 — build progress from the plan
         </div>
       </aside>
 
@@ -705,7 +616,7 @@
         <header class="topbar">
           <h2 id="viewTitle">Home</h2>
           <div class="topbar-actions">
-            <button class="ghost-btn" id="openSearchTabBtn" type="button">Open Invidious</button>
+            <button class="ghost-btn" id="openInstanceBtn" type="button">Open Invidious</button>
             <button class="primary-btn" id="quickAddBtn" type="button">Add Track</button>
           </div>
         </header>
@@ -714,17 +625,17 @@
           <section id="homeView" class="view active" aria-label="Home view">
             <div class="hero">
               <div>
-                <h3>Local library. Native Invidious playback.</h3>
+                <h3>Local library. Invidious playback.</h3>
                 <p>
-                  Musify Lite keeps your queue, favorites, playlists, and history in the browser,
-                  while search and playback stay in the configured Invidious instance.
+                  Your queue, favorites, playlists, and history live in the browser while search and playback remain in the configured Invidious instance.
                 </p>
                 <div class="hero-actions">
-                  <button class="primary-btn" type="button" data-action="search-dock">Search</button>
+                  <button class="primary-btn" type="button" data-action="go-search">Search</button>
                   <button class="ghost-btn" type="button" data-action="paste-url">Paste URL</button>
-                  <button class="ghost-btn" type="button" data-action="open-instance">Open Invidious</button>
+                  <button class="ghost-btn" type="button" data-action="open-instance">Open instance</button>
                 </div>
               </div>
+
               <div class="metric-grid">
                 <div class="metric">
                   <span>Queue</span>
@@ -751,8 +662,8 @@
                   <h4 class="section-title">Continue listening</h4>
                   <span class="pill" id="currentTrackPill">No track</span>
                 </div>
-                <div id="continueListeningCard" class="empty-state">
-                  No current track yet. Add a song or paste a YouTube or Invidious URL to begin.
+                <div id="continueCard" class="empty-state">
+                  No current track yet. Add a valid video ID or paste a supported YouTube or Invidious URL to begin.
                 </div>
               </div>
 
@@ -760,16 +671,16 @@
                 <div class="section-header">
                   <h4 class="section-title">Quick add</h4>
                 </div>
-                <form id="quickAddForm" class="lib-form">
-                  <input id="quickAddUrl" class="field" type="text" placeholder="Paste a YouTube URL or 11-char video ID" aria-label="Video URL or ID" />
+                <form id="quickAddForm" class="stack">
+                  <input id="quickAddUrl" class="field" type="text" placeholder="Paste URL or 11-character video ID" aria-label="URL or video ID" />
                   <div class="field-grid">
                     <input id="quickAddTitle" class="field" type="text" placeholder="Title (optional)" aria-label="Title" />
                     <input id="quickAddArtist" class="field" type="text" placeholder="Artist (optional)" aria-label="Artist" />
                   </div>
                   <div class="inline-actions">
                     <button class="primary-btn" type="submit">Play now</button>
-                    <button class="ghost-btn" type="button" data-action="queue-track">Add to queue</button>
-                    <button class="ghost-btn" type="button" data-action="favorite-track">Add to favorites</button>
+                    <button class="ghost-btn" type="button" data-action="add-quick-queue">Add to queue</button>
+                    <button class="ghost-btn" type="button" data-action="add-quick-favorite">Add to favorites</button>
                   </div>
                 </form>
               </div>
@@ -780,7 +691,7 @@
                 <div class="section-header">
                   <h4 class="section-title">Recent tracks</h4>
                 </div>
-                <div id="recentHistoryList" class="track-list"></div>
+                <div id="homeHistoryList" class="track-list"></div>
               </div>
 
               <div class="panel">
@@ -804,36 +715,37 @@
               <div class="section-header">
                 <h4 class="section-title">Native Invidious search</h4>
               </div>
+
               <form id="searchForm" class="stack">
                 <div class="search-box">
-                  <input id="searchInput" class="search-input" type="search" placeholder="Search on the configured Invidious instance" aria-label="Search query" />
+                  <input id="searchInput" class="search-input" type="search" placeholder="Search the configured Invidious instance" aria-label="Search query" />
                   <button class="primary-btn" type="submit">Search</button>
                 </div>
                 <div class="inline-actions">
                   <button class="ghost-btn" type="button" id="clearSearchBtn">Clear</button>
                   <button class="ghost-btn" type="button" id="reloadSearchBtn">Reload iframe</button>
-                  <button class="ghost-btn" type="button" id="openSearchNewTabBtn">Open in new tab</button>
-                  <button class="ghost-btn" type="button" id="toggleFullscreenBtn">Fullscreen search</button>
-                  <button class="ghost-btn" type="button" id="returnNowPlayingBtn">Return to Now Playing</button>
+                  <button class="ghost-btn" type="button" id="openSearchTabBtn">Open in new tab</button>
+                  <button class="ghost-btn" type="button" id="toggleSearchFullscreenBtn">Fullscreen</button>
+                  <button class="ghost-btn" type="button" id="backToNowPlayingBtn">Back to Now Playing</button>
                 </div>
               </form>
 
               <div class="chip-stack" id="recentSearchChips" aria-live="polite"></div>
 
-              <div class="media-shell" style="margin-top: 16px;">
+              <div class="player-shell" style="margin-top: 16px;">
                 <div class="panel" style="padding: 12px;">
                   <p class="inline-info" style="margin: 0 0 10px;">
-                    Search results are controlled by the Invidious website in the iframe below. Musify Lite cannot detect a selected result automatically.
+                    Search results are controlled by Invidious in the iframe below. Musify Lite cannot inspect a result click or read the iframe contents.
                   </p>
-                  <form id="searchUrlForm" class="stack">
-                    <label for="pastedResultUrl" class="sr-only">Copied result URL</label>
-                    <input id="pastedResultUrl" class="field" type="text" placeholder="Paste a selected search result URL or copy a video URL here" aria-label="Selected result URL" />
+                  <form id="resultUrlForm" class="stack">
+                    <input id="resultInput" class="field" type="text" placeholder="Paste a selected result URL or a video URL here" aria-label="Selected result URL" />
                     <div class="inline-actions">
                       <button class="primary-btn" type="submit">Load track</button>
                     </div>
                   </form>
                 </div>
-                <div class="player-frame-wrap">
+
+                <div class="player-box">
                   <iframe id="searchIframe" class="search-iframe" title="Invidious search" loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 </div>
               </div>
@@ -844,9 +756,7 @@
             <div class="panel">
               <div class="section-header">
                 <h4 class="section-title">Favorites</h4>
-                <div class="inline-actions">
-                  <button class="ghost-btn" type="button" id="favoriteSortBtn">Sort by date</button>
-                </div>
+                <button class="ghost-btn" type="button" id="favoriteSortBtn">Sort by date</button>
               </div>
               <div id="favoritesList" class="favorite-list"></div>
             </div>
@@ -858,13 +768,15 @@
                 <h4 class="section-title">Playlists</h4>
                 <button class="primary-btn" type="button" id="createPlaylistBtn">New playlist</button>
               </div>
-              <form id="playlistForm" class="playlist-form" style="display: none;">
+
+              <form id="playlistForm" class="stack" style="display: none; margin-bottom: 12px;">
                 <input id="playlistNameInput" class="field" type="text" placeholder="Playlist name" aria-label="Playlist name" />
                 <div class="inline-actions">
                   <button class="primary-btn" type="submit">Save playlist</button>
                   <button class="ghost-btn" type="button" id="cancelPlaylistBtn">Cancel</button>
                 </div>
               </form>
+
               <div id="playlistsList" class="playlist-list"></div>
             </div>
           </section>
@@ -884,19 +796,22 @@
               <div class="section-header">
                 <h4 class="section-title">Settings</h4>
               </div>
+
               <div class="settings-grid">
                 <div class="stack">
                   <label>
-                    <span class="inline-info">Invidious instance</span>
+                    <span class="inline-info">Invidious instance URL</span>
                     <input id="instanceInput" class="field" type="url" placeholder="https://invidious.tiekoetter.com" />
                   </label>
+
                   <label>
                     <span class="inline-info">Default player mode</span>
-                    <select id="playerModeInput" class="select">
+                    <select id="modeInput" class="select">
                       <option value="listen">Listen</option>
                       <option value="video">Video</option>
                     </select>
                   </label>
+
                   <label>
                     <span class="inline-info">Theme</span>
                     <select id="themeInput" class="select">
@@ -904,35 +819,34 @@
                       <option value="light">Light</option>
                     </select>
                   </label>
+
                   <label>
                     <span class="inline-info">History limit</span>
                     <input id="historyLimitInput" class="field" type="number" min="10" max="500" step="10" />
                   </label>
                 </div>
+
                 <div class="stack">
-                  <div class="checkbox-row">
+                  <div class="toggle-row">
                     <span>Attempt autoplay</span>
                     <button type="button" class="toggle on" data-toggle="autoplay" aria-label="Attempt autoplay"></button>
                   </div>
-                  <div class="checkbox-row">
+                  <div class="toggle-row">
                     <span>Use local=true on embed</span>
                     <button type="button" class="toggle on" data-toggle="localProxy" aria-label="Use local proxy"></button>
                   </div>
-                  <div class="checkbox-row">
+                  <div class="toggle-row">
                     <span>Remember queue</span>
                     <button type="button" class="toggle on" data-toggle="rememberQueue" aria-label="Remember queue"></button>
                   </div>
-                  <div class="checkbox-row">
-                    <span>Remember queue on reload</span>
-                    <button type="button" class="toggle on" data-toggle="rememberQueue" aria-label="Remember queue on reload"></button>
-                  </div>
                 </div>
               </div>
+
               <div class="inline-actions" style="margin-top: 18px;">
-                <button class="primary-btn" type="button" id="saveSettingsBtn">Save settings</button>
-                <button class="ghost-btn" type="button" id="exportBackupBtn">Export backup</button>
-                <button class="ghost-btn" type="button" id="importBackupBtn">Import backup</button>
-                <button class="danger-btn" type="button" id="resetDataBtn">Reset all data</button>
+                <button class="primary-btn" id="saveSettingsBtn" type="button">Save settings</button>
+                <button class="ghost-btn" id="exportBackupBtn" type="button">Export backup</button>
+                <button class="ghost-btn" id="importBackupBtn" type="button">Import backup</button>
+                <button class="danger-btn" id="resetDataBtn" type="button">Reset all data</button>
               </div>
               <input id="backupFileInput" type="file" accept="application/json" class="sr-only" />
             </div>
@@ -943,32 +857,37 @@
       <aside class="queue-panel" aria-label="Queue panel">
         <div class="queue-panel-header">
           <h3>Queue</h3>
-          <button class="tiny-btn ghost-btn" type="button" id="clearQueueBtn">Clear</button>
+          <button class="tiny-btn ghost-btn" id="clearQueueBtn" type="button">Clear</button>
         </div>
         <div id="queueList" class="queue-list"></div>
         <div class="queue-actions" style="margin-top: 14px;">
-          <button class="primary-btn" type="button" id="playPreviousBtn">Previous</button>
-          <button class="primary-btn" type="button" id="playNextBtn">Next</button>
+          <button class="primary-btn" id="prevBtn" type="button">Previous</button>
+          <button class="primary-btn" id="nextBtn" type="button">Next</button>
         </div>
       </aside>
     </div>
 
     <div class="sticky-player" aria-live="polite">
       <div class="player-summary">
-        <div class="cover-art" id="playerCover">♫</div>
+        <div class="player-cover" id="playerCover">♫</div>
         <div>
           <strong id="nowPlayingTitle">Nothing playing</strong>
-          <span id="nowPlayingMeta">Add a track to start</span>
+          <span id="nowPlayingMeta">Add a track to begin</span>
         </div>
       </div>
+
       <div class="inline-actions">
-        <button class="ghost-btn" type="button" id="reloadPlayerBtn">Reload embed</button>
-        <button class="ghost-btn" type="button" id="togglePlayerModeBtn">Switch to Video</button>
-        <button class="ghost-btn" type="button" id="openWatchBtn">Open native watch</button>
+        <button class="ghost-btn" id="reloadPlayerBtn" type="button">Reload embed</button>
+        <button class="ghost-btn" id="togglePlayerModeBtn" type="button">Switch to Video</button>
+        <button class="ghost-btn" id="openWatchBtn" type="button">Open watch</button>
       </div>
     </div>
 
-    <iframe id="playerIframe" class="player-iframe" title="Invidious player" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    <div class="player-shell" style="padding: 0 20px 20px;">
+      <div class="player-box">
+        <iframe id="playerIframe" class="player-iframe" title="Invidious player" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+    </div>
 
     <script>
       const STORAGE_KEYS = {
@@ -977,7 +896,7 @@
         favorites: 'musifyLite.favorites',
         playlists: 'musifyLite.playlists',
         history: 'musifyLite.history',
-        searches: 'musifyLite.searchHistory',
+        searchHistory: 'musifyLite.searchHistory',
         currentTrack: 'musifyLite.currentTrack'
       };
 
@@ -1001,140 +920,72 @@
         history: [],
         searchHistory: [],
         settings: { ...DEFAULT_SETTINGS },
-        sortMode: 'date'
+        favoritesSort: 'date'
       };
 
-      const els = {
-        body: document.body,
-        viewTitle: document.getElementById('viewTitle'),
-        queueMetric: document.getElementById('queueMetric'),
-        favoritesMetric: document.getElementById('favoritesMetric'),
-        historyMetric: document.getElementById('historyMetric'),
-        playlistsMetric: document.getElementById('playlistsMetric'),
-        homeFavoritesList: document.getElementById('homeFavoritesList'),
-        recentHistoryList: document.getElementById('recentHistoryList'),
-        homePlaylistsList: document.getElementById('homePlaylistsList'),
-        continueListeningCard: document.getElementById('continueListeningCard'),
-        currentTrackPill: document.getElementById('currentTrackPill'),
-        queueList: document.getElementById('queueList'),
-        favoritesList: document.getElementById('favoritesList'),
-        historyList: document.getElementById('historyList'),
-        playlistsList: document.getElementById('playlistsList'),
-        recentSearchChips: document.getElementById('recentSearchChips'),
-        searchIframe: document.getElementById('searchIframe'),
-        playerIframe: document.getElementById('playerIframe'),
-        nowPlayingTitle: document.getElementById('nowPlayingTitle'),
-        nowPlayingMeta: document.getElementById('nowPlayingMeta'),
-        playerCover: document.getElementById('playerCover'),
-        instanceInput: document.getElementById('instanceInput'),
-        playerModeInput: document.getElementById('playerModeInput'),
-        themeInput: document.getElementById('themeInput'),
-        historyLimitInput: document.getElementById('historyLimitInput'),
-        backupFileInput: document.getElementById('backupFileInput'),
-        playlistForm: document.getElementById('playlistForm'),
-        playlistNameInput: document.getElementById('playlistNameInput'),
-        searchForm: document.getElementById('searchForm'),
-        searchInput: document.getElementById('searchInput'),
-        searchUrlForm: document.getElementById('searchUrlForm'),
-        pastedResultUrl: document.getElementById('pastedResultUrl'),
-        quickAddForm: document.getElementById('quickAddForm'),
-        quickAddUrl: document.getElementById('quickAddUrl'),
-        quickAddTitle: document.getElementById('quickAddTitle'),
-        quickAddArtist: document.getElementById('quickAddArtist')
-      };
-
-      function safeJSONParse(value, fallback) {
+      function loadJSON(key, fallback) {
         try {
-          return JSON.parse(value || 'null') ?? fallback;
+          const raw = localStorage.getItem(key);
+          if (raw === null) return fallback;
+          return JSON.parse(raw) ?? fallback;
         } catch (error) {
           return fallback;
         }
       }
 
-      function loadJSON(key, fallback) {
-        const raw = localStorage.getItem(key);
-        return safeJSONParse(raw, fallback);
-      }
-
       function saveJSON(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
-      }
-
-      function loadAppState() {
-        state.settings = { ...DEFAULT_SETTINGS, ...loadJSON(STORAGE_KEYS.settings, DEFAULT_SETTINGS) };
-        state.queue = Array.isArray(loadJSON(STORAGE_KEYS.queue, [])) ? loadJSON(STORAGE_KEYS.queue, []) : [];
-        state.favorites = Array.isArray(loadJSON(STORAGE_KEYS.favorites, [])) ? loadJSON(STORAGE_KEYS.favorites, []) : [];
-        state.playlists = Array.isArray(loadJSON(STORAGE_KEYS.playlists, [])) ? loadJSON(STORAGE_KEYS.playlists, []) : [];
-        state.history = Array.isArray(loadJSON(STORAGE_KEYS.history, [])) ? loadJSON(STORAGE_KEYS.history, []) : [];
-        state.searchHistory = Array.isArray(loadJSON(STORAGE_KEYS.searches, [])) ? loadJSON(STORAGE_KEYS.searches, []) : [];
-        const savedTrack = loadJSON(STORAGE_KEYS.currentTrack, null);
-        state.currentTrack = savedTrack && typeof savedTrack === 'object' ? savedTrack : null;
-
-        let index = -1;
-        if (state.currentTrack && state.queue.length) {
-          index = state.queue.findIndex((track) => track.id === state.currentTrack.id);
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+          console.warn('Browser storage unavailable:', error);
         }
-        state.queueIndex = index >= 0 ? index : (state.queue.length > 0 ? 0 : -1);
       }
 
-      function persistState() {
-        saveJSON(STORAGE_KEYS.settings, state.settings);
-        if (state.settings.rememberQueue) {
-          saveJSON(STORAGE_KEYS.queue, state.queue);
-        }
-        saveJSON(STORAGE_KEYS.favorites, state.favorites);
-        saveJSON(STORAGE_KEYS.playlists, state.playlists);
-        saveJSON(STORAGE_KEYS.history, state.history);
-        saveJSON(STORAGE_KEYS.searches, state.searchHistory);
-        saveJSON(STORAGE_KEYS.currentTrack, state.currentTrack);
+      function normalizeTrack(track) {
+        const id = typeof track?.id === 'string' ? track.id.trim() : '';
+        return {
+          id: id || (typeof track?.videoId === 'string' ? track.videoId.trim() : ''),
+          title: track?.title || id || 'Untitled track',
+          artist: track?.artist || '',
+          thumbnail: track?.thumbnail || '',
+          sourceUrl: track?.sourceUrl || '',
+          addedAt: Number(track?.addedAt) || Date.now(),
+          lastPlayedAt: Number(track?.lastPlayedAt) || Date.now(),
+          playCount: Number(track?.playCount) || 0
+        };
       }
 
-      function normalizeInstanceUrl(value) {
-        if (!value || typeof value !== 'string') return null;
-        const candidate = value.trim();
-        if (!candidate) return null;
+      function sanitizeInstance(value) {
+        const candidate = (value || '').trim();
+        if (!candidate) return DEFAULT_SETTINGS.instance;
         try {
           const url = new URL(candidate);
-          if (url.protocol !== 'https:') return null;
-          if (url.pathname && url.pathname !== '/') return null;
-          if (url.search || url.hash) return null;
+          if (url.protocol !== 'https:') return DEFAULT_SETTINGS.instance;
+          if (url.pathname && url.pathname !== '/') return DEFAULT_SETTINGS.instance;
+          if (url.search || url.hash) return DEFAULT_SETTINGS.instance;
           return url.origin;
+        } catch (error) {
+          return DEFAULT_SETTINGS.instance;
+        }
+      }
+
+      function validateInstanceInput(value) {
+        const candidate = (value || '').trim();
+        try {
+          const url = new URL(candidate);
+          return url.protocol === 'https:' && !url.pathname.includes('/') && !url.search && !url.hash ? url.origin : null;
         } catch (error) {
           return null;
         }
       }
 
-      function sanitizeInstance() {
-        const cleaned = normalizeInstanceUrl(state.settings.instance) || DEFAULT_SETTINGS.instance;
-        state.settings.instance = cleaned;
-        return cleaned;
-      }
-
-      function makeTrack(data = {}) {
-        const id = typeof data.id === 'string' ? data.id.trim() : '';
-        return {
-          id: id || data.videoId || '',
-          title: data.title || id || 'Untitled track',
-          artist: data.artist || '',
-          thumbnail: data.thumbnail || '',
-          sourceUrl: data.sourceUrl || '',
-          addedAt: data.addedAt || Date.now(),
-          lastPlayedAt: data.lastPlayedAt || Date.now(),
-          playCount: Number(data.playCount) || 0
-        };
-      }
-
-      function toTrackRecord(track) {
-        return {
-          id: track.id,
-          title: track.title,
-          artist: track.artist || '',
-          thumbnail: track.thumbnail || '',
-          sourceUrl: track.sourceUrl || '',
-          addedAt: track.addedAt || Date.now(),
-          lastPlayedAt: track.lastPlayedAt || Date.now(),
-          playCount: Number(track.playCount) || 0
-        };
+      function escapeHTML(value) {
+        return String(value ?? '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
       }
 
       function extractVideoId(input) {
@@ -1148,42 +999,34 @@
 
         try {
           const url = new URL(trimmed);
-          const host = url.hostname.toLowerCase();
+          if (['javascript:', 'data:', 'file:'].includes(url.protocol)) return null;
+
+          const rawV = url.searchParams.get('v');
+          if (rawV && /^[A-Za-z0-9_-]{11}$/.test(rawV)) return rawV;
+
           const path = url.pathname.toLowerCase();
+          const matchEmbed = path.match(/\/embed\/([A-Za-z0-9_-]{11})/);
+          if (matchEmbed) return matchEmbed[1];
 
-          if (url.protocol === 'javascript:' || url.protocol === 'data:' || url.protocol === 'file:') {
-            return null;
-          }
+          const matchWatch = path.match(/\/watch\/?$/);
+          if (matchWatch && rawV && /^[A-Za-z0-9_-]{11}$/.test(rawV)) return rawV;
 
-          const v = url.searchParams.get('v');
-          if (v && /^[A-Za-z0-9_-]{11}$/.test(v)) {
-            return v;
-          }
-
-          if (host.includes('youtube.com') || host.includes('youtu.be') || host.includes('invidious')) {
-            if (path.includes('/embed/')) {
-              const id = path.split('/embed/')[1]?.split('/')[0];
-              if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return id;
-            }
-            if (path.includes('/watch')) {
-              const id = url.searchParams.get('v');
-              if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return id;
-            }
-          }
+          const maybeId = path.split('/').filter(Boolean).pop();
+          if (maybeId && /^[A-Za-z0-9_-]{11}$/.test(maybeId)) return maybeId;
         } catch (error) {
-          // Ignore malformed URLs and fall back to the plain ID check below.
+          // fall through to null
         }
 
         return null;
       }
 
-      function createSearchUrl(query) {
-        const base = sanitizeInstance();
-        return `${base}/search?q=${encodeURIComponent(query.trim())}`;
+      function buildSearchUrl(query) {
+        const base = sanitizeInstance(state.settings.instance);
+        return `${base}/search?q=${encodeURIComponent((query || '').trim())}`;
       }
 
-      function createPlayerUrl(videoId, mode = state.settings.defaultPlayerMode) {
-        const base = sanitizeInstance();
+      function buildEmbedUrl(videoId, mode = state.settings.defaultPlayerMode) {
+        const base = sanitizeInstance(state.settings.instance);
         const params = new URLSearchParams();
         params.set('autoplay', state.settings.autoplay ? '1' : '0');
         if (state.settings.localProxy) params.set('local', 'true');
@@ -1191,92 +1034,113 @@
         return `${base}/embed/${videoId}?${params.toString()}`;
       }
 
-      function createWatchUrl(videoId) {
-        const base = sanitizeInstance();
+      function buildWatchUrl(videoId) {
+        const base = sanitizeInstance(state.settings.instance);
         return `${base}/watch?v=${videoId}`;
       }
 
-      function openView(viewName) {
-        state.currentView = viewName;
-        document.querySelectorAll('.view').forEach((el) => el.classList.toggle('active', el.id === `${viewName}View`));
-        document.querySelectorAll('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === viewName));
-        const titles = {
-          home: 'Home',
-          search: 'Search',
-          favorites: 'Favorites',
-          playlists: 'Playlists',
-          history: 'History',
-          settings: 'Settings'
-        };
-        els.viewTitle.textContent = titles[viewName] || 'Home';
+      function isFavorite(trackId) {
+        return state.favorites.some((track) => track.id === trackId);
       }
 
-      function getRecentTrackSummary() {
-        if (!state.currentTrack) return 'Add a track to start';
-        return `${state.currentTrack.artist ? `${state.currentTrack.artist} · ` : ''}${state.currentTrack.title}`;
+      function loadApp() {
+        try {
+          state.settings = {
+            ...DEFAULT_SETTINGS,
+            ...loadJSON(STORAGE_KEYS.settings, DEFAULT_SETTINGS)
+          };
+          state.settings.instance = sanitizeInstance(state.settings.instance);
+          state.queue = Array.isArray(loadJSON(STORAGE_KEYS.queue, [])) ? loadJSON(STORAGE_KEYS.queue, []) : [];
+          state.favorites = Array.isArray(loadJSON(STORAGE_KEYS.favorites, [])) ? loadJSON(STORAGE_KEYS.favorites, []) : [];
+          state.playlists = Array.isArray(loadJSON(STORAGE_KEYS.playlists, [])) ? loadJSON(STORAGE_KEYS.playlists, []) : [];
+          state.history = Array.isArray(loadJSON(STORAGE_KEYS.history, [])) ? loadJSON(STORAGE_KEYS.history, []) : [];
+          state.searchHistory = Array.isArray(loadJSON(STORAGE_KEYS.searchHistory, [])) ? loadJSON(STORAGE_KEYS.searchHistory, []) : [];
+
+          const savedTrack = loadJSON(STORAGE_KEYS.currentTrack, null);
+          state.currentTrack = savedTrack ? normalizeTrack(savedTrack) : null;
+
+          if (state.queue.length && !state.currentTrack) {
+            state.currentTrack = normalizeTrack(state.queue[0]);
+            state.queueIndex = 0;
+          }
+
+          if (state.queue.length && state.currentTrack) {
+            const idx = state.queue.findIndex((track) => track.id === state.currentTrack.id);
+            state.queueIndex = idx >= 0 ? idx : 0;
+          }
+        } catch (error) {
+          console.warn('Unable to load app state:', error);
+        }
+      }
+
+      function persistApp() {
+        saveJSON(STORAGE_KEYS.settings, state.settings);
+        if (state.settings.rememberQueue) saveJSON(STORAGE_KEYS.queue, state.queue);
+        saveJSON(STORAGE_KEYS.favorites, state.favorites);
+        saveJSON(STORAGE_KEYS.playlists, state.playlists);
+        saveJSON(STORAGE_KEYS.history, state.history);
+        saveJSON(STORAGE_KEYS.searchHistory, state.searchHistory);
+        saveJSON(STORAGE_KEYS.currentTrack, state.currentTrack);
       }
 
       function renderMetrics() {
-        els.queueMetric.textContent = String(state.queue.length);
-        els.favoritesMetric.textContent = String(state.favorites.length);
-        els.historyMetric.textContent = String(state.history.length);
-        els.playlistsMetric.textContent = String(state.playlists.length);
+        document.getElementById('queueMetric').textContent = String(state.queue.length);
+        document.getElementById('favoritesMetric').textContent = String(state.favorites.length);
+        document.getElementById('historyMetric').textContent = String(state.history.length);
+        document.getElementById('playlistsMetric').textContent = String(state.playlists.length);
       }
 
-      function renderNowPlayingBar() {
+      function renderPlayerSummary() {
+        const titleEl = document.getElementById('nowPlayingTitle');
+        const metaEl = document.getElementById('nowPlayingMeta');
+        const coverEl = document.getElementById('playerCover');
+
         if (!state.currentTrack) {
-          els.nowPlayingTitle.textContent = 'Nothing playing';
-          els.nowPlayingMeta.textContent = 'Add a track to start';
-          els.playerCover.textContent = '♫';
+          titleEl.textContent = 'Nothing playing';
+          metaEl.textContent = 'Add a track to begin';
+          coverEl.textContent = '♫';
+          document.getElementById('currentTrackPill').textContent = 'No track';
+          return;
+        }
+
+        titleEl.textContent = state.currentTrack.title || state.currentTrack.id;
+        metaEl.textContent = state.currentTrack.artist ? `${state.currentTrack.artist} • ${state.currentTrack.id}` : state.currentTrack.id;
+        coverEl.textContent = (state.currentTrack.title || 'M').slice(0, 1).toUpperCase();
+        document.getElementById('currentTrackPill').textContent = state.currentTrack.title || state.currentTrack.id;
+      }
+
+      function renderContinueCard() {
+        const card = document.getElementById('continueCard');
+        if (!state.currentTrack) {
+          card.className = 'empty-state';
+          card.textContent = 'No current track yet. Add a valid video ID or paste a supported YouTube or Invidious URL to begin.';
           return;
         }
 
         const track = state.currentTrack;
-        els.nowPlayingTitle.textContent = track.title || track.id;
-        els.nowPlayingMeta.textContent = track.artist ? `${track.artist} • ${track.id}` : track.id;
-        els.playerCover.textContent = (track.title || 'M').slice(0, 1).toUpperCase();
-      }
-
-      function renderCurrentTrackCard() {
-        if (!state.currentTrack) {
-          els.continueListeningCard.className = 'empty-state';
-          els.continueListeningCard.textContent = 'No current track yet. Add a song or paste a YouTube or Invidious URL to begin.';
-          els.currentTrackPill.textContent = 'No track';
-          return;
-        }
-
-        const track = state.currentTrack;
-        els.currentTrackPill.textContent = track.title || track.id;
-        els.continueListeningCard.className = 'panel';
-        els.continueListeningCard.style.padding = '18px';
-        els.continueListeningCard.innerHTML = `
-          <div class="section-header" style="margin-bottom: 8px;">
+        card.className = 'panel';
+        card.style.padding = '18px';
+        card.innerHTML = `
+          <div class="section-header" style="margin-bottom: 10px;">
             <h4 style="margin: 0;">${escapeHTML(track.title || track.id)}</h4>
             <span class="pill">${state.settings.defaultPlayerMode}</span>
           </div>
-          <p style="margin: 0 0 12px; color: var(--muted);">${escapeHTML(track.artist || 'No artist entered')}</p>
+          <p style="margin: 0 0 12px; color: var(--muted);">${escapeHTML(track.artist || 'No artist set')}</p>
           <div class="inline-actions">
-            <button class="primary-btn" type="button" data-track-id="${track.id}" data-action="play-current">Play now</button>
+            <button class="primary-btn" type="button" data-action="play-current-track">Play now</button>
             <button class="ghost-btn" type="button" data-action="toggle-favorite" data-track-id="${track.id}">${isFavorite(track.id) ? 'Unfavorite' : 'Favorite'}</button>
-            <button class="ghost-btn" type="button" data-action="queue-track" data-track-id="${track.id}">Queue</button>
+            <button class="ghost-btn" type="button" data-action="enqueue-track" data-track-id="${track.id}">Queue</button>
           </div>
         `;
       }
 
-      function renderSearchHistory() {
-        if (!state.searchHistory.length) {
-          els.recentSearchChips.innerHTML = '<span class="inline-info">No recent searches yet.</span>';
-          return;
-        }
-        els.recentSearchChips.innerHTML = state.searchHistory.slice(0, 8).map((term) => `
-          <button class="chip" type="button" data-search-term="${escapeAttribute(term)}">${escapeHTML(term)}</button>
-        `).join('');
-      }
-
       function renderHomeLists() {
-        const latest = state.history.slice(0, 4);
-        els.recentHistoryList.innerHTML = latest.length
-          ? latest.map((entry) => `
+        const history = state.history.slice(0, 4);
+        const favorites = state.favorites.slice(0, 4);
+        const playlists = state.playlists.slice(0, 4);
+
+        document.getElementById('homeHistoryList').innerHTML = history.length
+          ? history.map((entry) => `
               <div class="track-item">
                 <div class="track-main">
                   <strong>${escapeHTML(entry.track.title || entry.track.id)}</strong>
@@ -1287,10 +1151,9 @@
                 </div>
               </div>
             `).join('')
-          : '<div class="empty-state">No recent tracks loaded yet.</div>';
+          : '<div class="empty-state">No tracks have been loaded into history yet.</div>';
 
-        const favorites = state.favorites.slice(0, 4);
-        els.homeFavoritesList.innerHTML = favorites.length
+        document.getElementById('homeFavoritesList').innerHTML = favorites.length
           ? favorites.map((track) => `
               <div class="track-item">
                 <div class="track-main">
@@ -1302,10 +1165,9 @@
                 </div>
               </div>
             `).join('')
-          : '<div class="empty-state">No favorites yet.</div>';
+          : '<div class="empty-state">No favorites saved yet.</div>';
 
-        const playlists = state.playlists.slice(0, 4);
-        els.homePlaylistsList.innerHTML = playlists.length
+        document.getElementById('homePlaylistsList').innerHTML = playlists.length
           ? playlists.map((playlist) => `
               <div class="track-item">
                 <div class="track-main">
@@ -1313,26 +1175,27 @@
                   <span>${playlist.tracks.length} tracks</span>
                 </div>
                 <div class="track-actions">
-                  <button class="tiny-btn" type="button" data-action="load-playlist" data-playlist-id="${playlist.id}">Open</button>
+                  <button class="tiny-btn" type="button" data-action="open-playlist" data-playlist-id="${playlist.id}">Open</button>
                 </div>
               </div>
             `).join('')
-          : '<div class="empty-state">No playlists yet.</div>';
+          : '<div class="empty-state">No playlists created yet.</div>';
       }
 
       function renderQueue() {
+        const container = document.getElementById('queueList');
         if (!state.queue.length) {
-          els.queueList.innerHTML = '<div class="empty-state">Queue is empty. Add a track to start listening.</div>';
+          container.innerHTML = '<div class="empty-state">Queue is empty. Add a track to start a manual queue.</div>';
           return;
         }
 
-        els.queueList.innerHTML = state.queue.map((track, index) => `
+        container.innerHTML = state.queue.map((track, index) => `
           <div class="queue-item ${index === state.queueIndex ? 'active' : ''}">
             <div class="queue-main">
               <strong>${escapeHTML(track.title || track.id)}</strong>
               <span>${escapeHTML(track.artist || 'No artist')}</span>
             </div>
-            <div class="mini-actions">
+            <div class="track-actions">
               <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${track.id}">Play</button>
               <button class="tiny-btn" type="button" data-action="remove-queue" data-track-id="${track.id}">Remove</button>
             </div>
@@ -1341,13 +1204,19 @@
       }
 
       function renderFavorites() {
-        const items = [...state.favorites].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
-        if (!items.length) {
-          els.favoritesList.innerHTML = '<div class="empty-state">No favorites yet. Save a track you want to keep.</div>';
+        const sortMode = state.favoritesSort;
+        const list = [...state.favorites].sort((a, b) => {
+          if (sortMode === 'title') return (a.title || '').localeCompare(b.title || '');
+          return (b.addedAt || 0) - (a.addedAt || 0);
+        });
+
+        const container = document.getElementById('favoritesList');
+        if (!list.length) {
+          container.innerHTML = '<div class="empty-state">No favorites yet. Save tracks you want to keep around.</div>';
           return;
         }
 
-        els.favoritesList.innerHTML = items.map((track) => `
+        container.innerHTML = list.map((track) => `
           <div class="favorite-item">
             <div class="favorite-main">
               <strong>${escapeHTML(track.title || track.id)}</strong>
@@ -1355,7 +1224,7 @@
             </div>
             <div class="favorite-actions">
               <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${track.id}">Play</button>
-              <button class="tiny-btn" type="button" data-action="queue-track" data-track-id="${track.id}">Queue</button>
+              <button class="tiny-btn" type="button" data-action="enqueue-track" data-track-id="${track.id}">Queue</button>
               <button class="tiny-btn" type="button" data-action="toggle-favorite" data-track-id="${track.id}">Unfavorite</button>
             </div>
           </div>
@@ -1363,12 +1232,13 @@
       }
 
       function renderHistory() {
+        const container = document.getElementById('historyList');
         if (!state.history.length) {
-          els.historyList.innerHTML = '<div class="empty-state">History is empty. Loading a track records it here.</div>';
+          container.innerHTML = '<div class="empty-state">History is empty. Loading a track records it here.</div>';
           return;
         }
 
-        els.historyList.innerHTML = state.history.map((entry) => `
+        container.innerHTML = state.history.map((entry) => `
           <div class="history-item">
             <div class="history-main">
               <strong>${escapeHTML(entry.track.title || entry.track.id)}</strong>
@@ -1376,280 +1246,296 @@
             </div>
             <div class="history-actions">
               <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${entry.track.id}">Replay</button>
-              <button class="tiny-btn" type="button" data-action="queue-track" data-track-id="${entry.track.id}">Queue</button>
+              <button class="tiny-btn" type="button" data-action="enqueue-track" data-track-id="${entry.track.id}">Queue</button>
             </div>
           </div>
         `).join('');
       }
 
       function renderPlaylists() {
+        const container = document.getElementById('playlistsList');
         if (!state.playlists.length) {
-          els.playlistsList.innerHTML = '<div class="empty-state">No playlists yet. Create one to organize your queue.</div>';
+          container.innerHTML = '<div class="empty-state">No playlists yet. Create one to organize your tracks.</div>';
           return;
         }
 
-        els.playlistsList.innerHTML = state.playlists.map((playlist) => `
-          <div class="playlist-item">
-            <div class="playlist-main">
-              <strong>${escapeHTML(playlist.name)}</strong>
-              <span>${playlist.tracks.length} tracks</span>
+        container.innerHTML = state.playlists.map((playlist) => `
+          <div class="playlist-card">
+            <div class="section-header">
+              <h4>${escapeHTML(playlist.name)}</h4>
+              <div class="inline-actions">
+                <button class="tiny-btn" type="button" data-action="open-playlist" data-playlist-id="${playlist.id}">Open</button>
+                <button class="tiny-btn" type="button" data-action="append-playlist" data-playlist-id="${playlist.id}">Queue</button>
+                <button class="tiny-btn" type="button" data-action="rename-playlist" data-playlist-id="${playlist.id}">Rename</button>
+                <button class="tiny-btn" type="button" data-action="delete-playlist" data-playlist-id="${playlist.id}">Delete</button>
+              </div>
             </div>
-            <div class="history-actions">
-              <button class="tiny-btn" type="button" data-action="load-playlist" data-playlist-id="${playlist.id}">Open</button>
-              <button class="tiny-btn" type="button" data-action="append-playlist" data-playlist-id="${playlist.id}">Queue</button>
-              <button class="tiny-btn" type="button" data-action="delete-playlist" data-playlist-id="${playlist.id}">Delete</button>
+            <div class="track-list">
+              ${playlist.tracks.length ? playlist.tracks.map((track, index) => `
+                <div class="track-item">
+                  <div class="track-main">
+                    <strong>${escapeHTML(track.title || track.id)}</strong>
+                    <span>${escapeHTML(track.artist || 'No artist')}</span>
+                  </div>
+                  <div class="track-actions">
+                    <button class="tiny-btn" type="button" data-action="play-track" data-track-id="${track.id}">Play</button>
+                    <button class="tiny-btn" type="button" data-action="playlist-remove-track" data-playlist-id="${playlist.id}" data-index="${index}">Remove</button>
+                  </div>
+                </div>
+              `).join('') : '<div class="empty-state">This playlist is empty.</div>'}
             </div>
           </div>
         `).join('');
       }
 
+      function renderSearchHistory() {
+        const container = document.getElementById('recentSearchChips');
+        if (!state.searchHistory.length) {
+          container.innerHTML = '<span class="inline-info">No recent searches yet.</span>';
+          return;
+        }
+
+        container.innerHTML = state.searchHistory.slice(0, 8).map((term) => `
+          <button class="chip" type="button" data-search-term="${escapeHTML(term)}">${escapeHTML(term)}</button>
+        `).join('');
+      }
+
       function renderSettings() {
-        const settings = state.settings;
-        els.instanceInput.value = settings.instance;
-        els.playerModeInput.value = settings.defaultPlayerMode;
-        els.themeInput.value = settings.theme;
-        els.historyLimitInput.value = settings.historyLimit;
+        document.getElementById('instanceInput').value = state.settings.instance;
+        document.getElementById('modeInput').value = state.settings.defaultPlayerMode;
+        document.getElementById('themeInput').value = state.settings.theme;
+        document.getElementById('historyLimitInput').value = state.settings.historyLimit;
+
         document.querySelectorAll('.toggle').forEach((toggle) => {
           const key = toggle.dataset.toggle;
-          const isOn = !!settings[key];
-          toggle.classList.toggle('on', isOn);
-          toggle.setAttribute('aria-pressed', String(isOn));
+          const enabled = !!state.settings[key];
+          toggle.classList.toggle('on', enabled);
+          toggle.setAttribute('aria-pressed', String(enabled));
         });
+      }
+
+      function updatePlayerSource() {
+        if (!state.currentTrack) {
+          document.getElementById('playerIframe').src = '';
+          return;
+        }
+        const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+        const mode = state.settings.defaultPlayerMode;
+        document.getElementById('playerIframe').src = buildEmbedUrl(videoId, mode);
+        document.getElementById('playerIframe').title = `Invidious ${mode} player`;
+        const toggleText = mode === 'listen' ? 'Switch to Video' : 'Switch to Listen';
+        document.getElementById('togglePlayerModeBtn').textContent = toggleText;
       }
 
       function renderAll() {
         renderMetrics();
-        renderNowPlayingBar();
-        renderCurrentTrackCard();
-        renderSearchHistory();
+        renderPlayerSummary();
+        renderContinueCard();
         renderHomeLists();
         renderQueue();
         renderFavorites();
         renderHistory();
         renderPlaylists();
+        renderSearchHistory();
         renderSettings();
         updatePlayerSource();
       }
 
-      function escapeHTML(text) {
-        return String(text ?? '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#39;');
+      function safeTrack(rawTrack) {
+        const normalized = normalizeTrack(rawTrack);
+        return normalized.id ? normalized : null;
       }
 
-      function escapeAttribute(value) {
-        return escapeHTML(value).replace(/`/g, '&#96;');
+      function addTrackToQueue(track, options = {}) {
+        const safe = safeTrack(track);
+        if (!safe) return false;
+
+        if (!state.queue.some((item) => item.id === safe.id)) {
+          state.queue.push(safe);
+        }
+
+        if (options.playNow || state.queue.length === 1) {
+          state.queueIndex = state.queue.findIndex((item) => item.id === safe.id);
+          state.currentTrack = safe;
+        }
+
+        persistApp();
+        renderAll();
+        return true;
       }
 
-      function isFavorite(trackId) {
-        return state.favorites.some((track) => track.id === trackId);
-      }
+      function recordHistory(track, options = {}) {
+        const safe = safeTrack(track);
+        if (!safe) return;
 
-      function ensureTrackInQueue(track) {
-        const existing = state.queue.find((item) => item.id === track.id);
-        if (!existing) {
-          state.queue.push(track);
+        const entry = { track: safe, playedAt: Date.now() };
+        state.history = state.history.filter((item) => item.track.id !== safe.id);
+        state.history.unshift(entry);
+        state.history = state.history.slice(0, Number(state.settings.historyLimit) || 100);
+
+        if (options.persist !== false) {
+          persistApp();
         }
       }
 
-      function setCurrentTrack(track, options = {}) {
-        if (!track || !track.id) return;
-        const safeTrack = makeTrack(track);
-        state.currentTrack = safeTrack;
-        const queueIndex = state.queue.findIndex((item) => item.id === safeTrack.id);
-        state.queueIndex = queueIndex >= 0 ? queueIndex : state.queueIndex;
+      function playTrack(track, options = {}) {
+        const safe = safeTrack(track);
+        if (!safe) return false;
+
+        state.currentTrack = safe;
+        const idx = state.queue.findIndex((item) => item.id === safe.id);
+        if (idx >= 0) state.queueIndex = idx;
 
         if (options.recordHistory !== false) {
-          const existingHistory = state.history.find((entry) => entry.track.id === safeTrack.id);
-          if (existingHistory) {
-            state.history = state.history.filter((entry) => entry.track.id !== safeTrack.id);
-          }
-          state.history.unshift({
-            track: toTrackRecord(safeTrack),
-            playedAt: Date.now()
-          });
-          state.history = state.history.slice(0, state.settings.historyLimit || 100);
-        }
-        persistState();
-        renderAll();
-      }
-
-      function addTrackToQueue(track, shouldPlay = false) {
-        const safeTrack = makeTrack(track);
-        if (!safeTrack.id) return alert('A valid video ID or URL is required.');
-
-        const existing = state.queue.find((item) => item.id === safeTrack.id);
-        if (!existing) {
-          state.queue.push(safeTrack);
+          recordHistory(safe, { persist: false });
         }
 
-        if (shouldPlay || state.queue.length === 1) {
-          const index = state.queue.findIndex((item) => item.id === safeTrack.id);
-          state.queueIndex = index >= 0 ? index : state.queue.length - 1;
-          state.currentTrack = safeTrack;
-        }
-
-        persistState();
-        renderAll();
-      }
-
-      function removeQueue(trackId) {
-        state.queue = state.queue.filter((track) => track.id !== trackId);
-        if (state.currentTrack && state.currentTrack.id === trackId) {
-          state.currentTrack = state.queue[state.queueIndex] || state.queue[0] || null;
-        }
-        if (state.queueIndex >= state.queue.length) {
+        if (state.settings.rememberQueue && !state.queue.some((item) => item.id === safe.id)) {
+          state.queue.push(safe);
           state.queueIndex = state.queue.length - 1;
         }
-        persistState();
+
+        persistApp();
         renderAll();
+        return true;
       }
 
-      function previousQueueItem() {
-        if (!state.queue.length) return;
-        const nextIndex = state.queueIndex <= 0 ? state.queue.length - 1 : state.queueIndex - 1;
-        state.queueIndex = nextIndex;
-        state.currentTrack = state.queue[nextIndex];
-        persistState();
-        renderAll();
-      }
-
-      function nextQueueItem() {
+      function nextQueueTrack() {
         if (!state.queue.length) return;
         const nextIndex = state.queueIndex >= state.queue.length - 1 ? 0 : state.queueIndex + 1;
         state.queueIndex = nextIndex;
-        state.currentTrack = state.queue[nextIndex];
-        persistState();
+        state.currentTrack = normalizeTrack(state.queue[nextIndex]);
+        recordHistory(state.currentTrack, { persist: false });
+        persistApp();
         renderAll();
       }
 
-      function updatePlayerSource() {
-        if (!state.currentTrack) {
-          els.playerIframe.src = '';
-          return;
-        }
-        const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
-        const mode = state.settings.defaultPlayerMode || 'listen';
-        els.playerIframe.src = createPlayerUrl(videoId, mode);
-        els.playerIframe.title = `Invidious ${mode} player`;
-        const modeBtn = document.getElementById('togglePlayerModeBtn');
-        if (modeBtn) {
-          modeBtn.textContent = mode === 'listen' ? 'Switch to Video' : 'Switch to Listen';
-        }
-      }
-
-      function togglePlayerMode() {
-        state.settings.defaultPlayerMode = state.settings.defaultPlayerMode === 'listen' ? 'video' : 'listen';
-        if (state.currentTrack) {
-          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
-          els.playerIframe.src = createPlayerUrl(videoId, state.settings.defaultPlayerMode);
-        }
-        persistState();
+      function prevQueueTrack() {
+        if (!state.queue.length) return;
+        const nextIndex = state.queueIndex <= 0 ? state.queue.length - 1 : state.queueIndex - 1;
+        state.queueIndex = nextIndex;
+        state.currentTrack = normalizeTrack(state.queue[nextIndex]);
+        recordHistory(state.currentTrack, { persist: false });
+        persistApp();
         renderAll();
       }
 
-      function handleSearch(query) {
-        const clean = (query || '').trim();
-        if (!clean) {
-          alert('Search query cannot be empty.');
-          return;
-        }
-        state.searchHistory = [clean, ...state.searchHistory.filter((item) => item !== clean)].slice(0, 20);
-        const url = createSearchUrl(clean);
-        els.searchIframe.src = url;
-        persistState();
-        renderAll();
-      }
-
-      function handleTrackInput(input, extraOptions = {}) {
-        const videoId = extractVideoId(input);
-        if (!videoId) {
-          alert('Unsupported or malformed input. Paste a valid YouTube URL, Invidious URL, or 11-character video ID.');
+      function parseAndLoadTrack(rawInput, opts = {}) {
+        const id = extractVideoId(rawInput);
+        if (!id) {
+          alert('Unsupported or malformed input. Paste a supported YouTube URL, Invidious URL, or 11-character video ID.');
           return null;
         }
 
-        const track = makeTrack({
-          id: videoId,
-          title: extraOptions.title || videoId,
-          artist: extraOptions.artist || '',
-          sourceUrl: input,
+        const track = normalizeTrack({
+          id,
+          title: opts.title || id,
+          artist: opts.artist || '',
+          sourceUrl: rawInput,
           addedAt: Date.now(),
           lastPlayedAt: Date.now(),
           playCount: 1
         });
 
-        if (extraOptions.toFavorite) {
-          if (!isFavorite(track.id)) {
+        if (opts.favorite) {
+          if (!state.favorites.some((item) => item.id === track.id)) {
             state.favorites.unshift(track);
           }
         }
 
-        if (extraOptions.toQueue) {
-          addTrackToQueue(track, extraOptions.playNow || false);
+        if (opts.queue) {
+          addTrackToQueue(track, { playNow: opts.playNow || false });
         }
 
-        if (extraOptions.playNow) {
-          setCurrentTrack(track, { recordHistory: true });
-          if (!state.queue.some((item) => item.id === track.id)) {
-            state.queue.push(track);
-          }
-          state.queueIndex = state.queue.findIndex((item) => item.id === track.id);
+        if (opts.playNow || opts.queue === true && !state.queue.length) {
+          playTrack(track, { recordHistory: true });
         }
 
-        persistState();
+        if (opts.playNow && !opts.queue) {
+          playTrack(track, { recordHistory: true });
+        }
+
+        if (opts.recordHistory !== false) {
+          recordHistory(track, { persist: false });
+        }
+
+        persistApp();
         renderAll();
         return track;
       }
 
-      function addFavorite(trackId) {
-        const track = state.queue.find((item) => item.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track || state.favorites.find((item) => item.id === trackId);
-        if (!track) return;
-        if (!isFavorite(track.id)) {
-          state.favorites.unshift(toTrackRecord(track));
+      function addFavorite(track) {
+        const safe = safeTrack(track);
+        if (!safe) return;
+
+        if (!state.favorites.some((item) => item.id === safe.id)) {
+          state.favorites.unshift(safe);
         }
-        persistState();
+        persistApp();
         renderAll();
       }
 
       function removeFavorite(trackId) {
         state.favorites = state.favorites.filter((track) => track.id !== trackId);
-        persistState();
+        persistApp();
         renderAll();
       }
 
-      function savePlaylist(name) {
-        const playlistName = (name || '').trim();
-        if (!playlistName) {
+      function toggleFavorite(trackId) {
+        const target = state.favorites.find((track) => track.id === trackId);
+        if (target) {
+          removeFavorite(trackId);
+        } else {
+          const queueMatch = state.queue.find((track) => track.id === trackId);
+          const historyMatch = state.history.find((entry) => entry.track.id === trackId)?.track;
+          const favoriteTrack = queueMatch || historyMatch || state.currentTrack;
+          if (favoriteTrack) addFavorite(favoriteTrack);
+        }
+      }
+
+      function createPlaylist(name) {
+        const cleaned = (name || '').trim();
+        if (!cleaned) {
           alert('Playlist name is required.');
-          return;
+          return null;
         }
-        const existing = state.playlists.find((playlist) => playlist.name.toLowerCase() === playlistName.toLowerCase());
-        if (existing) {
+
+        if (state.playlists.some((playlist) => playlist.name.toLowerCase() === cleaned.toLowerCase())) {
           alert('A playlist with that name already exists.');
-          return;
+          return null;
         }
+
         const playlist = {
           id: `playlist-${Date.now()}`,
-          name: playlistName,
+          name: cleaned,
           description: '',
           createdAt: Date.now(),
           updatedAt: Date.now(),
           tracks: []
         };
         state.playlists.unshift(playlist);
-        els.playlistForm.style.display = 'none';
-        els.playlistNameInput.value = '';
-        persistState();
+        persistApp();
         renderAll();
+        return playlist;
       }
 
       function deletePlaylist(playlistId) {
         if (!confirm('Delete this playlist?')) return;
         state.playlists = state.playlists.filter((playlist) => playlist.id !== playlistId);
-        persistState();
+        persistApp();
+        renderAll();
+      }
+
+      function renamePlaylist(playlistId) {
+        const playlist = state.playlists.find((item) => item.id === playlistId);
+        if (!playlist) return;
+        const nextName = prompt('Rename playlist', playlist.name);
+        if (nextName === null) return;
+        const cleaned = nextName.trim();
+        if (!cleaned) return alert('Playlist name cannot be empty.');
+        playlist.name = cleaned;
+        playlist.updatedAt = Date.now();
+        persistApp();
         renderAll();
       }
 
@@ -1659,8 +1545,40 @@
         playlist.tracks.forEach((track) => addTrackToQueue(track));
       }
 
+      function replaceQueueWithPlaylist(playlistId) {
+        const playlist = state.playlists.find((item) => item.id === playlistId);
+        if (!playlist) return;
+        state.queue = [...playlist.tracks];
+        state.queueIndex = state.queue.length ? 0 : -1;
+        state.currentTrack = state.queue[0] || null;
+        persistApp();
+        renderAll();
+      }
+
+      function addTrackToPlaylist(playlistId, track) {
+        const playlist = state.playlists.find((item) => item.id === playlistId);
+        if (!playlist) return;
+        const safe = safeTrack(track);
+        if (!safe) return;
+        if (!playlist.tracks.some((item) => item.id === safe.id)) {
+          playlist.tracks.push(safe);
+          playlist.updatedAt = Date.now();
+        }
+        persistApp();
+        renderAll();
+      }
+
+      function removeTrackFromPlaylist(playlistId, index) {
+        const playlist = state.playlists.find((item) => item.id === playlistId);
+        if (!playlist) return;
+        playlist.tracks.splice(index, 1);
+        playlist.updatedAt = Date.now();
+        persistApp();
+        renderAll();
+      }
+
       function exportBackup() {
-        const backup = {
+        const payload = {
           app: 'Musify Lite',
           formatVersion: 1,
           exportedAt: new Date().toISOString(),
@@ -1672,12 +1590,12 @@
           searchHistory: state.searchHistory
         };
 
-        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'musify-lite-backup.json';
-        a.click();
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'musify-lite-backup.json';
+        link.click();
         URL.revokeObjectURL(url);
       }
 
@@ -1686,17 +1604,18 @@
         const reader = new FileReader();
         reader.onload = () => {
           try {
-            const data = JSON.parse(String(reader.result));
-            if (!data || data.app !== 'Musify Lite' || data.formatVersion !== 1) {
-              throw new Error('Unsupported backup format');
-            }
-            state.settings = { ...DEFAULT_SETTINGS, ...(data.settings || {}) };
-            state.queue = Array.isArray(data.queue) ? data.queue : [];
-            state.favorites = Array.isArray(data.favorites) ? data.favorites : [];
-            state.playlists = Array.isArray(data.playlists) ? data.playlists : [];
-            state.history = Array.isArray(data.history) ? data.history : [];
-            state.searchHistory = Array.isArray(data.searchHistory) ? data.searchHistory : [];
-            persistState();
+            const parsed = JSON.parse(String(reader.result));
+            if (!parsed || parsed.app !== 'Musify Lite' || parsed.formatVersion !== 1) throw new Error('Invalid backup format');
+
+            state.settings = { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) };
+            state.queue = Array.isArray(parsed.queue) ? parsed.queue.map(normalizeTrack).filter(Boolean) : [];
+            state.favorites = Array.isArray(parsed.favorites) ? parsed.favorites.map(normalizeTrack).filter(Boolean) : [];
+            state.playlists = Array.isArray(parsed.playlists) ? parsed.playlists : [];
+            state.history = Array.isArray(parsed.history) ? parsed.history : [];
+            state.searchHistory = Array.isArray(parsed.searchHistory) ? parsed.searchHistory : [];
+            state.currentTrack = state.queue[0] || null;
+            state.queueIndex = state.queue.length ? 0 : -1;
+            persistApp();
             renderAll();
             alert('Backup imported successfully.');
           } catch (error) {
@@ -1707,270 +1626,294 @@
       }
 
       function resetAllData() {
-        if (!confirm('Reset all library data and settings? This cannot be undone.')) return;
+        if (!confirm('Reset all application data and settings?')) return;
         state.settings = { ...DEFAULT_SETTINGS };
         state.queue = [];
-        state.queueIndex = -1;
         state.favorites = [];
         state.playlists = [];
         state.history = [];
         state.searchHistory = [];
         state.currentTrack = null;
-        persistState();
+        state.queueIndex = -1;
+        persistApp();
         renderAll();
       }
 
-      function handleQuickAdd(formData) {
-        const urlValue = formData.get('url');
-        const titleValue = formData.get('title');
-        const artistValue = formData.get('artist');
-        const track = handleTrackInput(urlValue, {
-          title: titleValue,
-          artist: artistValue,
-          toQueue: true,
-          playNow: true
-        });
-        if (track) {
-          els.quickAddUrl.value = '';
-          els.quickAddTitle.value = '';
-          els.quickAddArtist.value = '';
-        }
+      function setView(viewName) {
+        state.currentView = viewName;
+        document.querySelectorAll('.view').forEach((view) => view.classList.toggle('active', view.id === `${viewName}View`));
+        document.querySelectorAll('.nav-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.view === viewName));
+        const titles = { home: 'Home', search: 'Search', favorites: 'Favorites', playlists: 'Playlists', history: 'History', settings: 'Settings' };
+        document.getElementById('viewTitle').textContent = titles[viewName] || 'Home';
       }
 
-      function saveSettings() {
-        const normalizedInstance = normalizeInstanceUrl(els.instanceInput.value);
-        if (!normalizedInstance) {
-          alert('The Invidious instance must be a valid HTTPS origin without a path or query string.');
+      function handleSearch(query) {
+        const trimmed = (query || '').trim();
+        if (!trimmed) {
+          alert('Search query is empty.');
           return;
         }
-        state.settings.instance = normalizedInstance;
-        state.settings.defaultPlayerMode = els.playerModeInput.value;
-        state.settings.theme = els.themeInput.value;
-        state.settings.historyLimit = Number(els.historyLimitInput.value) || DEFAULT_SETTINGS.historyLimit;
-        state.settings.autoplay = document.querySelector('[data-toggle="autoplay"]').classList.contains('on');
-        state.settings.localProxy = document.querySelector('[data-toggle="localProxy"]').classList.contains('on');
-        state.settings.rememberQueue = document.querySelectorAll('[data-toggle="rememberQueue"]')[0].classList.contains('on');
-        document.body.dataset.theme = state.settings.theme;
-        persistState();
-        renderAll();
+
+        state.searchHistory = [trimmed, ...state.searchHistory.filter((item) => item !== trimmed)].slice(0, 20);
+        const url = buildSearchUrl(trimmed);
+        document.getElementById('searchIframe').src = url;
+        persistApp();
+        renderSearchHistory();
       }
 
-      document.querySelectorAll('.nav-btn').forEach((btn) => {
-        btn.addEventListener('click', () => openView(btn.dataset.view));
-      });
+      function bindEvents() {
+        document.querySelectorAll('.nav-btn').forEach((button) => {
+          button.addEventListener('click', () => setView(button.dataset.view));
+        });
 
-      document.querySelectorAll('[data-action]').forEach((button) => {
-        button.addEventListener('click', (event) => {
-          const action = event.currentTarget.dataset.action;
-          const trackId = event.currentTarget.dataset.trackId;
-          const playlistId = event.currentTarget.dataset.playlistId;
-          const searchTerm = event.currentTarget.dataset.searchTerm;
+        document.querySelectorAll('[data-action]').forEach((button) => {
+          button.addEventListener('click', async (event) => {
+            const action = event.currentTarget.dataset.action;
+            const trackId = event.currentTarget.dataset.trackId;
+            const playlistId = event.currentTarget.dataset.playlistId;
+            const index = Number(event.currentTarget.dataset.index);
 
-          if (action === 'search-dock') openView('search');
-          if (action === 'paste-url') document.getElementById('pastedResultUrl').focus();
-          if (action === 'open-instance') window.open(sanitizeInstance(), '_blank', 'noopener');
-          if (action === 'play-track' && trackId) {
-            const item = state.queue.find((track) => track.id === trackId) || state.favorites.find((track) => track.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track;
-            if (item) {
-              setCurrentTrack(item);
+            if (action === 'go-search') setView('search');
+            if (action === 'paste-url') {
+              setView('search');
+              document.getElementById('resultInput').focus();
             }
-          }
-          if (action === 'toggle-favorite' && trackId) {
-            if (isFavorite(trackId)) {
-              removeFavorite(trackId);
-            } else {
-              addFavorite(trackId);
+            if (action === 'open-instance') window.open(sanitizeInstance(state.settings.instance), '_blank', 'noopener');
+            if (action === 'play-current-track' && state.currentTrack) playTrack(state.currentTrack);
+            if (action === 'play-track' && trackId) {
+              const match = state.queue.find((track) => track.id === trackId) || state.favorites.find((track) => track.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track || state.currentTrack;
+              if (match) playTrack(match);
             }
-          }
-          if (action === 'queue-track' && trackId) {
-            const item = state.queue.find((track) => track.id === trackId) || state.favorites.find((track) => track.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track;
-            if (item) addTrackToQueue(item, false);
-          }
-          if (action === 'remove-queue' && trackId) removeQueue(trackId);
-          if (action === 'play-current') {
-            if (state.currentTrack) setCurrentTrack(state.currentTrack);
-          }
-          if (action === 'load-playlist' && playlistId) {
-            const playlist = state.playlists.find((item) => item.id === playlistId);
-            if (playlist && playlist.tracks.length) {
-              state.queue = [...state.queue, ...playlist.tracks];
-              state.queueIndex = state.queue.length - playlist.tracks.length;
-              state.currentTrack = playlist.tracks[0];
-              persistState();
+            if (action === 'toggle-favorite' && trackId) toggleFavorite(trackId);
+            if (action === 'enqueue-track' && trackId) {
+              const match = state.queue.find((track) => track.id === trackId) || state.favorites.find((track) => track.id === trackId) || state.history.find((entry) => entry.track.id === trackId)?.track || state.currentTrack;
+              if (match) addTrackToQueue(match, { playNow: false });
+            }
+            if (action === 'remove-queue' && trackId) {
+              state.queue = state.queue.filter((track) => track.id !== trackId);
+              if (state.currentTrack && state.currentTrack.id === trackId) {
+                state.currentTrack = state.queue[state.queueIndex] || state.queue[0] || null;
+              }
+              state.queueIndex = state.queue.findIndex((track) => track.id === (state.currentTrack || {}).id);
+              persistApp();
               renderAll();
             }
+            if (action === 'open-playlist' && playlistId) {
+              const playlist = state.playlists.find((item) => item.id === playlistId);
+              if (playlist && playlist.tracks.length) {
+                replaceQueueWithPlaylist(playlistId);
+              }
+            }
+            if (action === 'append-playlist' && playlistId) appendPlaylistToQueue(playlistId);
+            if (action === 'rename-playlist' && playlistId) renamePlaylist(playlistId);
+            if (action === 'delete-playlist' && playlistId) deletePlaylist(playlistId);
+            if (action === 'playlist-remove-track' && playlistId && Number.isInteger(index)) removeTrackFromPlaylist(playlistId, index);
+            if (action === 'add-quick-queue') {
+              const raw = document.getElementById('quickAddUrl').value.trim();
+              if (!raw) return alert('Please enter a URL or video ID.');
+              const track = parseAndLoadTrack(raw, { queue: true, playNow: false, title: document.getElementById('quickAddTitle').value.trim(), artist: document.getElementById('quickAddArtist').value.trim() });
+              if (track) {
+                document.getElementById('quickAddUrl').value = '';
+                document.getElementById('quickAddTitle').value = '';
+                document.getElementById('quickAddArtist').value = '';
+              }
+            }
+            if (action === 'add-quick-favorite') {
+              const raw = document.getElementById('quickAddUrl').value.trim();
+              if (!raw) return alert('Please enter a URL or video ID.');
+              const track = parseAndLoadTrack(raw, { queue: false, playNow: false, favorite: true, title: document.getElementById('quickAddTitle').value.trim(), artist: document.getElementById('quickAddArtist').value.trim() });
+              if (track) {
+                document.getElementById('quickAddUrl').value = '';
+                document.getElementById('quickAddTitle').value = '';
+                document.getElementById('quickAddArtist').value = '';
+              }
+            }
+          });
+        });
+
+        document.getElementById('quickAddForm').addEventListener('submit', (event) => {
+          event.preventDefault();
+          const raw = document.getElementById('quickAddUrl').value.trim();
+          if (!raw) return alert('Please enter a supported URL or 11-character video ID.');
+          const track = parseAndLoadTrack(raw, {
+            title: document.getElementById('quickAddTitle').value.trim(),
+            artist: document.getElementById('quickAddArtist').value.trim(),
+            queue: true,
+            playNow: true,
+            favorite: false
+          });
+          if (track) {
+            document.getElementById('quickAddUrl').value = '';
+            document.getElementById('quickAddTitle').value = '';
+            document.getElementById('quickAddArtist').value = '';
           }
-          if (action === 'append-playlist' && playlistId) appendPlaylistToQueue(playlistId);
-          if (action === 'delete-playlist' && playlistId) deletePlaylist(playlistId);
-          if (searchTerm) {
-            handleSearch(searchTerm);
+        });
+
+        document.getElementById('searchForm').addEventListener('submit', (event) => {
+          event.preventDefault();
+          handleSearch(document.getElementById('searchInput').value);
+        });
+
+        document.getElementById('clearSearchBtn').addEventListener('click', () => {
+          document.getElementById('searchInput').value = '';
+          document.getElementById('searchIframe').src = '';
+        });
+
+        document.getElementById('reloadSearchBtn').addEventListener('click', () => {
+          const query = document.getElementById('searchInput').value.trim();
+          if (query) document.getElementById('searchIframe').src = buildSearchUrl(query);
+        });
+
+        document.getElementById('openSearchTabBtn').addEventListener('click', () => {
+          const query = document.getElementById('searchInput').value.trim();
+          window.open(buildSearchUrl(query), '_blank', 'noopener');
+        });
+
+        document.getElementById('toggleSearchFullscreenBtn').addEventListener('click', () => {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          } else {
+            document.exitFullscreen().catch(() => {});
           }
         });
-      });
 
-      document.getElementById('playPreviousBtn').addEventListener('click', previousQueueItem);
-      document.getElementById('playNextBtn').addEventListener('click', nextQueueItem);
-      document.getElementById('clearQueueBtn').addEventListener('click', () => {
-        state.queue = [];
-        state.queueIndex = -1;
-        if (state.currentTrack && !state.queue.length) {
-          state.currentTrack = null;
-        }
-        persistState();
-        renderAll();
-      });
-      document.getElementById('quickAddBtn').addEventListener('click', () => openView('home'));
-      document.getElementById('openSearchTabBtn').addEventListener('click', () => window.open(createSearchUrl(''), '_blank', 'noopener'));
-      document.getElementById('reloadPlayerBtn').addEventListener('click', () => {
-        if (state.currentTrack) {
-          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
-          els.playerIframe.src = createPlayerUrl(videoId, state.settings.defaultPlayerMode);
-        }
-      });
-      document.getElementById('togglePlayerModeBtn').addEventListener('click', togglePlayerMode);
-      document.getElementById('openWatchBtn').addEventListener('click', () => {
-        if (state.currentTrack) {
-          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
-          window.open(createWatchUrl(videoId), '_blank', 'noopener');
-        }
-      });
+        document.getElementById('backToNowPlayingBtn').addEventListener('click', () => setView('home'));
 
-      document.getElementById('searchForm').addEventListener('submit', (event) => {
-        event.preventDefault();
-        handleSearch(els.searchInput.value);
-      });
-
-      document.getElementById('clearSearchBtn').addEventListener('click', () => {
-        els.searchInput.value = '';
-        els.searchIframe.src = '';
-      });
-      document.getElementById('reloadSearchBtn').addEventListener('click', () => {
-        const query = els.searchInput.value.trim();
-        if (query) {
-          els.searchIframe.src = createSearchUrl(query);
-        }
-      });
-      document.getElementById('openSearchNewTabBtn').addEventListener('click', () => {
-        const query = els.searchInput.value.trim();
-        window.open(createSearchUrl(query || ''), '_blank', 'noopener');
-      });
-      document.getElementById('returnNowPlayingBtn').addEventListener('click', () => {
-        if (state.currentTrack) {
-          openView('home');
-        } else {
-          openView('home');
-        }
-      });
-      document.getElementById('toggleFullscreenBtn').addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().catch(() => {});
-        } else {
-          document.exitFullscreen().catch(() => {});
-        }
-      });
-
-      els.searchUrlForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const input = els.pastedResultUrl.value;
-        const videoId = extractVideoId(input);
-        if (!videoId) {
-          alert('Unsupported or malformed input. Paste a valid YouTube or Invidious URL or 11-character video ID.');
-          return;
-        }
-        const track = handleTrackInput(input, {
-          title: '',
-          artist: '',
-          toQueue: true,
-          playNow: true,
-          toFavorite: false
+        document.getElementById('resultUrlForm').addEventListener('submit', (event) => {
+          event.preventDefault();
+          const raw = document.getElementById('resultInput').value.trim();
+          const track = parseAndLoadTrack(raw, { queue: true, playNow: true, favorite: false, title: '', artist: '' });
+          if (track) {
+            document.getElementById('resultInput').value = '';
+            setView('home');
+          }
         });
-        if (track) {
-          els.pastedResultUrl.value = '';
-          openView('home');
-        }
-      });
 
-      els.quickAddForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const urlValue = els.quickAddUrl.value.trim();
-        const titleValue = els.quickAddTitle.value.trim();
-        const artistValue = els.quickAddArtist.value.trim();
-        const track = handleTrackInput(urlValue, {
-          title: titleValue || '',
-          artist: artistValue || '',
-          toQueue: true,
-          playNow: true,
-          toFavorite: false
+        document.getElementById('favoriteSortBtn').addEventListener('click', () => {
+          state.favoritesSort = state.favoritesSort === 'date' ? 'title' : 'date';
+          document.getElementById('favoriteSortBtn').textContent = state.favoritesSort === 'date' ? 'Sort by date' : 'Sort by title';
+          renderFavorites();
         });
-        if (track) {
-          els.quickAddUrl.value = '';
-          els.quickAddTitle.value = '';
-          els.quickAddArtist.value = '';
-        }
-      });
 
-      document.getElementById('createPlaylistBtn').addEventListener('click', () => {
-        els.playlistForm.style.display = 'grid';
-        els.playlistNameInput.focus();
-      });
-      document.getElementById('cancelPlaylistBtn').addEventListener('click', () => {
-        els.playlistForm.style.display = 'none';
-        els.playlistNameInput.value = '';
-      });
-      els.playlistForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        savePlaylist(els.playlistNameInput.value);
-      });
-      document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-        state.history = [];
-        persistState();
-        renderAll();
-      });
-      document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
-      document.getElementById('exportBackupBtn').addEventListener('click', exportBackup);
-      document.getElementById('importBackupBtn').addEventListener('click', () => els.backupFileInput.click());
-      document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
-      els.backupFileInput.addEventListener('change', (event) => importBackup(event.target.files[0]));
-      document.getElementById('favoriteSortBtn').addEventListener('click', () => {
-        state.favorites = [...state.favorites].sort((a, b) => (state.sortMode === 'date' ? (b.addedAt || 0) - (a.addedAt || 0) : (a.title || '').localeCompare(b.title || '')));
-        state.sortMode = state.sortMode === 'date' ? 'title' : 'date';
-        document.getElementById('favoriteSortBtn').textContent = state.sortMode === 'date' ? 'Sort by title' : 'Sort by date';
-        persistState();
-        renderAll();
-      });
+        document.getElementById('createPlaylistBtn').addEventListener('click', () => {
+          document.getElementById('playlistForm').style.display = 'grid';
+          document.getElementById('playlistNameInput').focus();
+        });
 
-      document.querySelectorAll('.toggle').forEach((toggle) => {
-        toggle.addEventListener('click', () => {
-          const key = toggle.dataset.toggle;
-          toggle.classList.toggle('on');
-          const isOn = toggle.classList.contains('on');
-          state.settings[key] = isOn;
-          persistState();
+        document.getElementById('cancelPlaylistBtn').addEventListener('click', (event) => {
+          event.preventDefault();
+          document.getElementById('playlistForm').style.display = 'none';
+          document.getElementById('playlistNameInput').value = '';
+        });
+
+        document.getElementById('playlistForm').addEventListener('submit', (event) => {
+          event.preventDefault();
+          const name = document.getElementById('playlistNameInput').value;
+          createPlaylist(name);
+          document.getElementById('playlistForm').style.display = 'none';
+          document.getElementById('playlistNameInput').value = '';
+        });
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+          state.history = [];
+          persistApp();
           renderAll();
         });
-      });
+
+        document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+          const instance = validateInstanceInput(document.getElementById('instanceInput').value);
+          if (!instance) {
+            alert('The Invidious instance must be a valid HTTPS origin without a path or query string.');
+            return;
+          }
+
+          state.settings.instance = instance;
+          state.settings.defaultPlayerMode = document.getElementById('modeInput').value;
+          state.settings.theme = document.getElementById('themeInput').value;
+          state.settings.historyLimit = Number(document.getElementById('historyLimitInput').value) || DEFAULT_SETTINGS.historyLimit;
+          document.querySelectorAll('.toggle').forEach((toggle) => {
+            const key = toggle.dataset.toggle;
+            state.settings[key] = toggle.classList.contains('on');
+          });
+
+          document.body.dataset.theme = state.settings.theme;
+          persistApp();
+          renderAll();
+        });
+
+        document.getElementById('exportBackupBtn').addEventListener('click', exportBackup);
+        document.getElementById('importBackupBtn').addEventListener('click', () => document.getElementById('backupFileInput').click());
+        document.getElementById('backupFileInput').addEventListener('change', (event) => {
+          const file = event.target.files?.[0];
+          if (file) importBackup(file);
+          event.target.value = '';
+        });
+
+        document.getElementById('resetDataBtn').addEventListener('click', resetAllData);
+        document.getElementById('clearQueueBtn').addEventListener('click', () => {
+          state.queue = [];
+          state.queueIndex = -1;
+          state.currentTrack = null;
+          persistApp();
+          renderAll();
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', prevQueueTrack);
+        document.getElementById('nextBtn').addEventListener('click', nextQueueTrack);
+
+        document.getElementById('reloadPlayerBtn').addEventListener('click', () => {
+          if (!state.currentTrack) return;
+          const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+          document.getElementById('playerIframe').src = buildEmbedUrl(videoId, state.settings.defaultPlayerMode);
+        });
+
+        document.getElementById('togglePlayerModeBtn').addEventListener('click', () => {
+          state.settings.defaultPlayerMode = state.settings.defaultPlayerMode === 'listen' ? 'video' : 'listen';
+          persistApp();
+          renderAll();
+        });
+
+        document.getElementById('openWatchBtn').addEventListener('click', () => {
+          if (state.currentTrack) {
+            const videoId = extractVideoId(state.currentTrack.id) || state.currentTrack.id;
+            window.open(buildWatchUrl(videoId), '_blank', 'noopener');
+          }
+        });
+
+        document.getElementById('openInstanceBtn').addEventListener('click', () => {
+          window.open(sanitizeInstance(state.settings.instance), '_blank', 'noopener');
+        });
+
+        document.getElementById('quickAddBtn').addEventListener('click', () => setView('home'));
+
+        document.getElementById('resultInput').addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('resultUrlForm').requestSubmit();
+          }
+        });
+
+        document.addEventListener('click', (event) => {
+          const chip = event.target.closest('.chip');
+          if (chip) {
+            handleSearch(chip.dataset.searchTerm || chip.textContent.trim());
+          }
+        });
+
+        document.querySelectorAll('.toggle').forEach((toggle) => {
+          toggle.addEventListener('click', () => {
+            toggle.classList.toggle('on');
+          });
+        });
+      }
 
       document.addEventListener('DOMContentLoaded', () => {
-        try {
-          loadAppState();
-        } catch (error) {
-          warning('Storage was unavailable. Continuing with defaults.');
-        }
+        loadApp();
         document.body.dataset.theme = state.settings.theme || DEFAULT_SETTINGS.theme;
-        if (!state.currentTrack && state.queue.length) {
-          state.currentTrack = state.queue[0];
-          state.queueIndex = 0;
-        }
+        bindEvents();
+        document.getElementById('favoriteSortBtn').textContent = state.favoritesSort === 'date' ? 'Sort by date' : 'Sort by title';
         renderAll();
-        sanitizeInstance();
-        if (state.searchHistory.length) {
-          els.searchInput.value = state.searchHistory[0];
-        }
       });
-
-      function warning(message) {
-        console.warn(message);
-      }
     </script>
   </body>
 </html>
